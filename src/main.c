@@ -43,6 +43,7 @@
                 "With no FILE, or when FILE is -, read standard input.\n" \
                 "\"Another Huffman\" encoder project v1.0.0: ah <https://github.com/mrsarm/ah>\n"
 
+
 /* Initialize the global variables with the command arguments */
 ah_data* init_options(int argc, char *argv[]);
 
