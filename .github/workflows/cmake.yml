@@ -1,0 +1,25 @@
+name: CMake
+
+on:
+  push:
+    branches: master
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      run: cmake .
+
+    - name: Build
+      run: make
+
+    - name: Test
+      run: ctest
+      
