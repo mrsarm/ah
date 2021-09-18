@@ -32,6 +32,11 @@ add_executable(test_huff test/test_huff.c
         ${BASE_TEST_SOURCE_FILES}
         ${BASE_SOURCE_FILES})
 
+# Executable with unit tests "test_util"
+add_executable(test_util test/test_util.c
+        ${BASE_TEST_SOURCE_FILES}
+        ${BASE_SOURCE_FILES})
+
 # Install with `make install`
 install(TARGETS ah
         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
@@ -48,6 +53,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/BuildTestTarget.cmake"
 # Unit tests with `make test`
 add_test(test_ah ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_ah)
 add_test(test_huff ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_huff)
+add_test(test_util ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_util)
 
 # To clean everything: compiled binaries and *make* files
 add_custom_target(clean-all
