@@ -224,6 +224,8 @@ int ah_decode(ah_data *data) {
     }
     // Original input size in bytes
     fread(&data->length_in, sizeof(data->length_in), 1, data->fi);
+    if (data->length_in == 0) return 0; // Empty file
+
     // Number of source symbols
     fread(&data->freql->length, sizeof(data->freql->length), 1, data->fi);
 
@@ -282,7 +284,7 @@ int ah_decode(ah_data *data) {
     bits <<= 8;
     fread(&a, sizeof(a), 1, data->fi);
     bits |= a;
-    int j = 0;      /* Cada 8 bits leemos otro byte */
+    int j = 0;      /* Each 8 bits another byte is read */
     node_freqlist* q = data->freql->tree;
 
     do {

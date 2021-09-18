@@ -473,6 +473,7 @@ void _build_binary_code(node_freqlist *n, int len, int v)
  * The freqlist needs to be sorted first.
  */
 void freqlist_build_huff(freqlist *l) { // while inside main
+    if (!l->list) return;
     l->tree = l->list;
     node_freqlist *p = l->list;
     while (p->next) {
