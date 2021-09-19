@@ -77,7 +77,8 @@ To clean all the compiled binaries and the "Makefiles" files:
 ### Tests
 
 Tests are built with CHEAT <https://github.com/Tuplanolla/cheat>,
-a unit testing framework for C/C++, and can be executed
+a unit testing framework for C/C++. There are also tests built
+with Bash scripts. All of them can be executed
 with CMake CTest:
 
     $ make test
@@ -87,6 +88,10 @@ if the tests fail), first build the project (`make`), and then execute:
 
     $ out/test_ah && out/test_huff
 
+To execute just one of the bash scripts, simply run any of them
+after build the project, e.g.:
+
+    $ ./test/scripts/test_ah_enc_stream.sh
 
 About
 -----
