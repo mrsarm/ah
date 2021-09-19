@@ -30,13 +30,13 @@
 #endif /* TRUE */
 
 #define OK                              0       /* Functions return 0 as success code */
-#define ERROR_MEM                       -2      /* Insufficient memory error. */
-#define ERROR_PARAM                     -3      /* Command line parametrization error. */
-#define ERROR_FILE_NOT_FOUND            -5      /* The input file is not found or can not
+#define ERROR_MEM                       2       /* Insufficient memory error. */
+#define ERROR_PARAM                     3       /* Command line parametrization error. */
+#define ERROR_FILE_NOT_FOUND            5       /* The input file is not found or can not
                                                    be opened. */
-#define ERROR_FILE_OUT                  -6      /* Cannot open output file */
-#define INVALID_FILE_IN                 -7      /* Cannot open output file */
-#define ERROR_UNKNOWN                   -50     /* Unknown error */
+#define ERROR_FILE_OUT                  6       /* Cannot open output file */
+#define INVALID_FILE_IN                 7       /* Cannot open output file */
+#define ERROR_UNKNOWN                   50      /* Unknown error */
 
 #define OUTPUT_EXT                      ".ah"   /* Default output file name extension. */
 
