@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="../out/ah"
+AH="out/ah"
 echo "Testing wrong arguments ..."
 ${AH} -Nop >/dev/null 2>/dev/null
 EXITCODE=$?

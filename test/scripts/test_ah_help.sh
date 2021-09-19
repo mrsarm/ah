@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="../out/ah"
+AH="out/ah"
 echo "Testing help ..."
 ${AH} -h >/dev/null
 EXITCODE=$?

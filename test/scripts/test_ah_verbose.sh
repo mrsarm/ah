@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="../out/ah"
+AH="out/ah"
 echo "Testing verbose mode ..."
 echo "short message" | ${AH} -cv >/dev/null 2>/dev/null
 EXITCODE=$?
