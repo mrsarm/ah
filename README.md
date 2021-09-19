@@ -86,12 +86,12 @@ with CMake CTest:
 To run the tests and see all the output in the console (specially
 if the tests fail), first build the project (`make`), and then execute:
 
-    $ out/test_ah && out/test_huff
+    $ out/test_ah && out/test_huff && out/test_util
 
 To execute just one of the bash scripts, simply run any of them
 after build the project, e.g.:
 
-    $ ./test/scripts/test_ah_enc_stream.sh
+    $ ./test/scripts/test_enc_stream.sh
 
 About
 -----
