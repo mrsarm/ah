@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="out/ah"
+source "${BASH_SOURCE%/*}"/_setup_ah.sh
 echo "Testing compressing and decompressing random stream ..."
 RANDOM_MSG="${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
 echo -n ${RANDOM_MSG} | ${AH} -c | ${AH} -d | grep ${RANDOM_MSG} >/dev/null

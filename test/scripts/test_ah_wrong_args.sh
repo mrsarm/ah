@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="out/ah"
+source "${BASH_SOURCE%/*}"/_setup_ah.sh
 echo "Testing wrong arguments ..."
 ${AH} -Nop >/dev/null 2>/dev/null
 EXITCODE=$?

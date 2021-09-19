@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="out/ah"
+source "${BASH_SOURCE%/*}"/_setup_ah.sh
 echo "Testing help ..."
 ${AH} -h >/dev/null
 EXITCODE=$?

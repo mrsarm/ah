@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AH="out/ah"
+source "${BASH_SOURCE%/*}"/_setup_ah.sh
 echo "Testing compressing and decompressing stream ..."
 echo -n "short message" | ${AH} -c | ${AH} -d | grep "short message" >/dev/null
 EXITCODE=$?
