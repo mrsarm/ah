@@ -55,8 +55,8 @@ add_test(test_ah ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_ah)
 add_test(test_huff ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_huff)
 add_test(test_util ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_util)
 
-find_program (BASH_PROGRAM bash)
-if (BASH_PROGRAM)
+find_program(BASH_PROGRAM bash)
+if(BASH_PROGRAM)
     add_test(test_help
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_help.sh)
     add_test(test_wrong_args
@@ -67,7 +67,7 @@ if (BASH_PROGRAM)
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_random_stream.sh)
     add_test(test_verbose
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_verbose.sh)
-endif (BASH_PROGRAM)
+endif(BASH_PROGRAM)
 
 # To clean everything: compiled binaries and *make* files
 add_custom_target(clean-all
