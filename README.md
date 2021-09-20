@@ -5,8 +5,8 @@ Command line tool "ah": **Another Huffman** encoder to compress and decompress
 files, with the cool addition of the verbose mode, that display useful
 information like the encoding table and the Huffman binary tree.
 
-Encode the word _"banana"_ from the input stream, show encoding info and store
-the encoded result in `banana.ah`:
+Let's encode the word _"banana"_ from the input stream, show encoding
+info and store the encoded result in the `banana.ah` file:
 
     $ echo -n banana | ah -v - > banana.ah
     > Frequency table and Huffman coding
