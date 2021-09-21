@@ -69,11 +69,13 @@ void _pop(char depth[], int *di) {
 }
 
 void _freqlist_fprintf_tree(FILE *f, node_freqlist *tree, char *depth, int *di, char *start) {
-    fprintf(f, "%s", start);
-    if (tree->freq) {
+    if (start)
+        fprintf(f, "%s", start);
+    if (!tree)
+        return;
+    if (tree->freq)
         fprintf(f, " (%li)", tree->freq);
-    }
-    if (!tree->zero && !tree->one) {
+    if (!tree->zero && !tree->one && *di) {     // No subtrees and not root --> leaf
         fprintf(f, " '%c' [%02X]",
                 (tree->symb < 0x7F && tree->symb >= 0x20) ? tree->symb : '.',
                 tree->symb);
