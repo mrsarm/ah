@@ -59,8 +59,8 @@ The project uses *CMakes* to build the executable.
 
        $ sudo make install
 
-   To install into another folder, execute the step 1
-   overwriting the `CMAKE_INSTALL_PREFIX` variable, eg.
+   To install into another folder, when executing the step 1
+   overwrite the `CMAKE_INSTALL_PREFIX` variable, eg.
    to install into the `/usr/bin` folder:
 
        $ cmake -DCMAKE_INSTALL_PREFIX=/usr .
