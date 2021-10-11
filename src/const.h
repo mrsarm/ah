@@ -40,6 +40,9 @@
 
 #define OUTPUT_EXT                      ".ah"   /* Default output file name extension. */
 
+#define MAGIC_NUMBER                    "\x0f\xa1"  /* 2 bytes identifier of the file format */
+#define MAGIC_NUMBER_SIZE               2
+
 
 #define DEPTH_BUFFER_SIZE               2048    /* 2K buffer used when printing the
                                                    Huffman tree */

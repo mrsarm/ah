@@ -61,6 +61,8 @@ if(BASH_PROGRAM)
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_help.sh)
     add_test(test_wrong_args
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_wrong_args.sh)
+    add_test(test_wrong_input_file
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_wrong_input_file.sh)
     add_test(test_enc_stream
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_stream.sh)
     add_test(test_enc_empty_stream

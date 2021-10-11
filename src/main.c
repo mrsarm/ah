@@ -93,8 +93,8 @@ void compress() {
         case OK: break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
-            default:
-                error_unknown_code(r, "ah_count", (void*)ah_data_free_resources, data);
+        default:
+            error_unknown_code(r, "ah_count", (void*)ah_data_free_resources, data);
     }
 
     freqlist_build_huff(data->freql);                   // Build Huffman tree
@@ -114,6 +114,8 @@ void decompress() {
         case OK: break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
+        case INVALID_FILE_IN:
+            error_invalid_file_in(r, "input", data->filename_in, (void*)ah_data_free_resources, data);
         default:
             error_unknown_code(r, "ah_decode", (void*)ah_data_free_resources, data);
     }

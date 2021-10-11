@@ -169,6 +169,10 @@ int ah_count(ah_data *data) {
  * Encode and write the compressed data.
  */
 void ah_encode(ah_data *data) {
+    // Write "magic" number that identifies the format
+    fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
+    //TODO Note that the use of sizeof is a bad idea to determine
+    //     the space used in a multiplatform tool
     // Write original input size in bytes
     fwrite(&data->length_in, sizeof(data->length_in), 1, data->fo);
     // Number of source symbols
@@ -221,6 +225,11 @@ int ah_decode(ah_data *data) {
     data->freql->tree = freqlist_create_node((unsigned char)0, (unsigned char)0, 0l);
     if (!data->freql->tree) {
         return ERROR_MEM;
+    }
+    char magic_number[MAGIC_NUMBER_SIZE];
+    fread(&magic_number, MAGIC_NUMBER_SIZE, 1, data->fi);
+    if (strcmp(magic_number, MAGIC_NUMBER) != 0) {
+        return INVALID_FILE_IN;
     }
     // Original input size in bytes
     fread(&data->length_in, sizeof(data->length_in), 1, data->fi);
