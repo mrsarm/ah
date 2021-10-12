@@ -187,7 +187,7 @@ node_freqlist *freqlist_find(const freqlist *l, unsigned char c) {
 /*
  * Increase the frequency of the symbol 'c' in +1,
  * and rearrange if necessary. If the symbol is not present
- * in the list, add them, an set the frequency of the node in 1.
+ * in the list, add it, and set the frequency of the node in 1.
  * Return the node with the symbol.
  */
 node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
@@ -203,8 +203,7 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
         pnode1=pnode1->next;
     }
 
-    /* After found the symbol in the list, increase its frequency
-       and call the function that will promote the symbol. */
+    /* After found the symbol in the list, increase its frequency. */
     if (pnode1 && c==pnode1->symb) {
         pnode1->freq++;
         l->size++;
