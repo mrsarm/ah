@@ -1,25 +1,30 @@
 name: CMake
 
-on:
-  push:
-    branches: main
-  pull_request:
-    paths-ignore:
-      - '**.md'
+on: [push, pull_request]
 
 jobs:
+
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
 
+    - id: skip_check
+      uses: fkirc/skip-duplicate-actions@master
+      with:
+        concurrent_skipping: 'same_content_newer'
+        paths_ignore: '["**.md"]'
+
     - name: Configure CMake
+      if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
       run: cmake .
 
     - name: Build
+      if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
       run: make
 
     - name: Test
+      if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
       run: ctest
-
