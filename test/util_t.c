@@ -1,6 +1,6 @@
 /* test_util.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
 #include "util.h"
 
 
-/**
- * Counts the buffer passed and returns the ``ah_data`` with the output data.
+/*
+ * Count the buffer passed and return the ``ah_data`` with the output data.
  */
 ah_data* count_buff(unsigned char* buff_in, unsigned int buff_in_length, int verbose) {
 
@@ -53,7 +53,7 @@ ah_data* count_buff(unsigned char* buff_in, unsigned int buff_in_length, int ver
 
 
 /*
- * Frees only the resources used in test mode.
+ * Free only the resources used in test mode.
  */
 void free_resources(ah_data *data)
 {
@@ -63,7 +63,7 @@ void free_resources(ah_data *data)
 
 
 /*
- * Checks if plist is equals to expected_freqlist (second list is in
+ * Check if plist is equals to expected_freqlist (second list is in
  * array format).
  */
 int freqlist_check(const freqlist* plist, const unsigned int expected_freqlist[][2],
@@ -95,7 +95,7 @@ int freqlist_check(const freqlist* plist, const unsigned int expected_freqlist[]
 }
 
 /*
- * Checks if plist tree data is equals to expected_freqlist (second list is in
+ * Check if plist tree data is equals to expected_freqlist (second list is in
  * array format).
  */
 int freqlist_check_tree(const freqlist* plist, const unsigned int expected_freqlist[][3],
