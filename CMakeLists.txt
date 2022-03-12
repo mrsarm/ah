@@ -32,6 +32,11 @@ add_executable(test_huff test/test_huff.c
         ${BASE_TEST_SOURCE_FILES}
         ${BASE_SOURCE_FILES})
 
+# Executable with unit tests "test_util"
+add_executable(test_util test/test_util.c
+        ${BASE_TEST_SOURCE_FILES}
+        ${BASE_SOURCE_FILES})
+
 # Install with `make install`
 install(TARGETS ah
         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
@@ -48,6 +53,25 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/BuildTestTarget.cmake"
 # Unit tests with `make test`
 add_test(test_ah ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_ah)
 add_test(test_huff ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_huff)
+add_test(test_util ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_util)
+
+find_program(BASH_PROGRAM bash)
+if(BASH_PROGRAM)
+    add_test(test_help
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_help.sh)
+    add_test(test_wrong_args
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_wrong_args.sh)
+    add_test(test_wrong_input_file
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_wrong_input_file.sh)
+    add_test(test_enc_stream
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_stream.sh)
+    add_test(test_enc_empty_stream
+            ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_empty_stream.sh)
+    add_test(test_enc_random_stream
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_random_stream.sh)
+    add_test(test_verbose
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_verbose.sh)
+endif(BASH_PROGRAM)
 
 # To clean everything: compiled binaries and *make* files
 add_custom_target(clean-all

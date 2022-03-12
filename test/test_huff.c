@@ -19,7 +19,6 @@
 
 
 #include <string.h>
-#include <util.h>
 #include <ah.h>
 #include "const.h"
 #include "cheat.h"
@@ -65,21 +64,4 @@ CHEAT_TEST(expected_build_huff_4_ok,
     fprintf(stderr, "\n");
     freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
     cheat_assert(  freqlist_check_tree(data->freql, expected_ah_4, ARRAY_SIZE(expected_ah_4))  );
-)
-
-
-/***************
- *  Test strings
- ***************/
-
-CHEAT_TEST(rmsub_expected_null_too_small,
-    cheat_assert( rmsub("small.ax", "largefilename") == NULL );
-)
-
-CHEAT_TEST(rmsub_expected_not_substring,
-    cheat_assert( rmsub("file.txt", ".doc") == NULL );
-)
-
-CHEAT_TEST(rmsub_expected_string_substring_ok_with_more_ext,
-    cheat_assert( strcmp(rmsub("file.txt.av", ".av"), "file.txt") == 0 );
 )

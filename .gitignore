@@ -28,7 +28,10 @@ CMakeFiles/
 Makefile
 cmake_install.cmake
 install_manifest.txt
+BuildTestTarget.cmake
+CTestTestfile.cmake
 out/
+Testing/
 
 # Linux desktop files
 .directory

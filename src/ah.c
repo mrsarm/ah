@@ -169,10 +169,15 @@ int ah_count(ah_data *data) {
  * Encode and write the compressed data.
  */
 void ah_encode(ah_data *data) {
+    // Write "magic" number that identifies the format
+    fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
+    //TODO Note that the use of sizeof is a bad idea to determine
+    //     the space used in a multiplatform tool
     // Write original input size in bytes
     fwrite(&data->length_in, sizeof(data->length_in), 1, data->fo);
-    // Number of source symbols
+    // Write number of source symbols
     fwrite(&data->freql->length, sizeof(data->freql->length), 1, data->fo);
+    // Write each node from the freqlist
     node_freqlist *pnode = data->freql->list;
     while(pnode) {
         fwrite(&pnode->symb, sizeof(pnode->symb), 1, data->fo);
@@ -194,8 +199,8 @@ void ah_encode(ah_data *data) {
         pnode = freqlist_find(data->freql, c);
         // If nbits + pnode->nbits > 32, pull off a byte
         while(nbits + pnode->nbits > 32) {
-            c = dword >> (nbits - 8);                   // Extract the 8 bits with higher order
-            fwrite(&c, sizeof(c), 1, data->fo);      // and write down into the file.
+            c = dword >> (nbits - 8);                   // Extract the 8 bits with higher
+            fwrite(&c, sizeof(c), 1, data->fo);         // order and write down into the file.
             nbits -= 8;                                 // Now we have those 8 bits available
         }
         dword <<= pnode->nbits;                         // Make room for the new byte
@@ -222,8 +227,15 @@ int ah_decode(ah_data *data) {
     if (!data->freql->tree) {
         return ERROR_MEM;
     }
+    char magic_number[MAGIC_NUMBER_SIZE];
+    fread(&magic_number, MAGIC_NUMBER_SIZE, 1, data->fi);
+    if (strcmp(magic_number, MAGIC_NUMBER) != 0) {
+        return INVALID_FILE_IN;
+    }
     // Original input size in bytes
     fread(&data->length_in, sizeof(data->length_in), 1, data->fi);
+    if (data->length_in == 0) return 0; // Empty file
+
     // Number of source symbols
     fread(&data->freql->length, sizeof(data->freql->length), 1, data->fi);
 
@@ -282,7 +294,7 @@ int ah_decode(ah_data *data) {
     bits <<= 8;
     fread(&a, sizeof(a), 1, data->fi);
     bits |= a;
-    int j = 0;      /* Cada 8 bits leemos otro byte */
+    int j = 0;      /* Each 8 bits another byte is read */
     node_freqlist* q = data->freql->tree;
 
     do {

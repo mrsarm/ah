@@ -73,3 +73,29 @@ CHEAT_TEST(expected_buff_out_3_ok,
     data=count_buff(buff_3, ARRAY_SIZE(buff_3), FALSE);
     cheat_assert(  freqlist_check(data->freql, expected_ah_3, ARRAY_SIZE(expected_ah_3))  );
 )
+
+
+/****************************
+ *  DATA SET 4: empty set
+ ****************************/
+CHEAT_DECLARE(
+    unsigned char buff_4[] =            { };
+    unsigned int expected_ah_4[][2] =   { };
+)
+CHEAT_TEST(expected_buff_out_4_ok,
+    data=count_buff(buff_4, ARRAY_SIZE(buff_4), FALSE);
+    cheat_assert(  freqlist_check(data->freql, expected_ah_4, ARRAY_SIZE(expected_ah_4))  );
+)
+
+
+/****************************
+ *  DATA SET 5: only 1 symbol
+ ****************************/
+CHEAT_DECLARE(
+    unsigned char buff_5[] =            { 0 };
+    unsigned int expected_ah_5[][2] =   { {0, 1} };
+)
+CHEAT_TEST(expected_buff_out_5_ok,
+    data=count_buff(buff_5, ARRAY_SIZE(buff_5), FALSE);
+    cheat_assert(  freqlist_check(data->freql, expected_ah_5, ARRAY_SIZE(expected_ah_5))  );
+)

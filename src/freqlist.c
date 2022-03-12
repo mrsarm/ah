@@ -69,11 +69,13 @@ void _pop(char depth[], int *di) {
 }
 
 void _freqlist_fprintf_tree(FILE *f, node_freqlist *tree, char *depth, int *di, char *start) {
-    fprintf(f, "%s", start);
-    if (tree->freq) {
+    if (start)
+        fprintf(f, "%s", start);
+    if (!tree)
+        return;
+    if (tree->freq)
         fprintf(f, " (%li)", tree->freq);
-    }
-    if (!tree->zero && !tree->one) {
+    if (!tree->zero && !tree->one && *di) {     // No subtrees and not root --> leaf
         fprintf(f, " '%c' [%02X]",
                 (tree->symb < 0x7F && tree->symb >= 0x20) ? tree->symb : '.',
                 tree->symb);
@@ -185,7 +187,7 @@ node_freqlist *freqlist_find(const freqlist *l, unsigned char c) {
 /*
  * Increase the frequency of the symbol 'c' in +1,
  * and rearrange if necessary. If the symbol is not present
- * in the list, add them, an set the frequency of the node in 1.
+ * in the list, add it, and set the frequency of the node in 1.
  * Return the node with the symbol.
  */
 node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
@@ -201,8 +203,7 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
         pnode1=pnode1->next;
     }
 
-    /* After found the symbol in the list, increase its frequency
-       and call the function that will promote the symbol. */
+    /* After found the symbol in the list, increase its frequency. */
     if (pnode1 && c==pnode1->symb) {
         pnode1->freq++;
         l->size++;
@@ -473,6 +474,7 @@ void _build_binary_code(node_freqlist *n, int len, int v)
  * The freqlist needs to be sorted first.
  */
 void freqlist_build_huff(freqlist *l) { // while inside main
+    if (!l->list) return;
     l->tree = l->list;
     node_freqlist *p = l->list;
     while (p->next) {

@@ -1,6 +1,6 @@
 /* main.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@
                 "  -h       display this help and exit\n" \
                 "\n" \
                 "With no FILE, or when FILE is -, read standard input.\n" \
-                "\"Another Huffman\" encoder project v1.0.0: ah <https://github.com/mrsarm/ah>\n"
+                "\"Another Huffman\" encoder project v2.0.0: ah <https://github.com/mrsarm/ah>\n"
 
 
 /* Initialize the global variables with the command arguments */
@@ -93,8 +93,8 @@ void compress() {
         case OK: break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
-            default:
-                error_unknown_code(r, "ah_count", (void*)ah_data_free_resources, data);
+        default:
+            error_unknown_code(r, "ah_count", (void*)ah_data_free_resources, data);
     }
 
     freqlist_build_huff(data->freql);                   // Build Huffman tree
@@ -114,6 +114,8 @@ void decompress() {
         case OK: break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
+        case INVALID_FILE_IN:
+            error_invalid_file_in(r, "input", data->filename_in, (void*)ah_data_free_resources, data);
         default:
             error_unknown_code(r, "ah_decode", (void*)ah_data_free_resources, data);
     }
