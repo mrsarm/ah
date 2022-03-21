@@ -1,6 +1,6 @@
 /* freqlist.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -193,10 +193,6 @@ node_freqlist *freqlist_find(const freqlist *l, unsigned char c) {
 node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
     node_freqlist *pnode1, *pnode_prev = NULL;
 
-    /* This function promotes the position of the symbol in the list
-       after increase its frequency, or being created. */
-    void _freqlist_promote(freqlist *l, node_freqlist *pnode);
-
     pnode1=l->list;
     while (pnode1 && c!=pnode1->symb) {
         pnode_prev=pnode1;
@@ -211,8 +207,7 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
     }
 
     /* If the element doesn't exist, it's added to the end of the list,
-       with frequency=1, and is promoted in the list with the same
-       promotion algorithm. */
+       with frequency=1. */
     pnode1 = freqlist_create_node(c, 0, 1l);
     if (pnode1) {
         l->size++;
@@ -221,7 +216,6 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
             pnode1->pos=pnode_prev->pos + 1;
             pnode1->prev=pnode_prev;
             pnode_prev->next=pnode1;
-            _freqlist_promote(l, pnode1);
         } else {
             l->list=pnode1; // First element in the list
         }
