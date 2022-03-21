@@ -55,7 +55,7 @@ typedef struct _node_freqlist
                                        with frequency greater or equal
                                        than this. */
 
-    /* Tree data, used to have build the binary tree with the Huffman codes */
+    /* Tree data, used to build the binary tree with the Huffman codes */
 
     struct _node_freqlist *tnext;   /* Next node in the tree list */
     struct _node_freqlist *zero;    /* Pointer to the previous node in
@@ -144,7 +144,7 @@ int freqlist_sort(freqlist *l);
 /*
  * Build the Huffman tree and binary
  * codes for encoding.
- * The freqlist needs to be sorted first.
+ * The freqlist has to be sorted first.
  */
 void freqlist_build_huff(freqlist *l);
 

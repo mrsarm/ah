@@ -231,7 +231,7 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
 
 
 /* Promote the position of the symbol in the list
-   (called after its frequency was increased, or after being created. */
+   (called after its frequency was increased, or after being created). */
 void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
     unsigned char i;
     int steps = 0;      /* num of elements walked until reached new pos */
@@ -447,7 +447,7 @@ void _insert_order(node_freqlist** head, node_freqlist *e) {
     node_freqlist *p = *head, *a = NULL;
     // Find the symbol in the list (sorted by freq)
     while(p && p->freq < e->freq) {
-        a = p;                  // Keep the current element to insert
+        a = p;                  // Keep the current element to insert after
         p = p->tnext;
     }
     // Insert the element
@@ -471,9 +471,9 @@ void _build_binary_code(node_freqlist *n, int len, int v)
 /*
  * Build the Huffman tree and binary
  * codes for encoding.
- * The freqlist needs to be sorted first.
+ * The freqlist has to be sorted first.
  */
-void freqlist_build_huff(freqlist *l) { // while inside main
+void freqlist_build_huff(freqlist *l) {
     if (!l->list) return;
     l->tree = l->list;
     node_freqlist *p = l->list;
