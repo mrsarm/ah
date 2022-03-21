@@ -141,6 +141,7 @@ node_freqlist* freqlist_create_node(unsigned char c,
     return pnode;
 }
 
+/* free the memory of all the nodes of the list */
 void _freqlist_free_list(node_freqlist *list) {
     node_freqlist *pnode, *pnode_prev;
     pnode = list;
@@ -151,10 +152,14 @@ void _freqlist_free_list(node_freqlist *list) {
     }
 }
 
+/* free the memory of all the "intermediate" nodes of the tree.
+   To free the nodes that hold symbols (leaves) use _freqlist_free_list */
 void _freqlist_free_tree(node_freqlist *tree) {
     if(tree->zero) _freqlist_free_tree(tree->zero);
     if(tree->one)  _freqlist_free_tree(tree->one);
-    free(tree);
+    if (tree->zero || tree->one) {
+        free(tree);
+    }
 }
 
 /*
@@ -163,9 +168,8 @@ void _freqlist_free_tree(node_freqlist *tree) {
 void freqlist_free(freqlist* l) {
     if (l->tree) {
         _freqlist_free_tree(l->tree);
-    } else {
-        _freqlist_free_list(l->list);
     }
+    _freqlist_free_list(l->list);
     free(l);
 }
 
@@ -471,11 +475,11 @@ void freqlist_build_huff(freqlist *l) {
     if (!l->list) return;
     l->tree = l->list;
     node_freqlist *p = l->list;
-    while (p->next) {
+    do {
         p->tnext = p->next;
         p = p->next;
-    }
-    while(l->tree && l->tree->tnext) {               // While exist at least 2 elements in the list
+    } while (p);
+    while (l->tree && l->tree->tnext) {              // While exist at least 2 elements in the list
         p = (node_freqlist *)malloc(sizeof(node_freqlist));     // A new tree node (that is a sub-tree)
         p->symb = 0;                                            // Does not correspond to any symbol
         p->one = l->tree;                                       // Branch one
