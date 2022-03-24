@@ -228,11 +228,9 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
 }
 
 
-/* Promote the position of the symbol in the list
-   (called after its frequency was increased, or after being created). */
+/* Promote the position of the symbol in the list */
 void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
     unsigned char i;
-    int steps = 0;      /* num of elements walked until reached new pos */
 
     node_freqlist *pnode_prev=pnode->prev,
                   *pnode_next;
@@ -241,7 +239,6 @@ void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
        or have the same frequency but a lower ASCII code ... */
     while (pnode_prev && node_cmp(pnode, pnode_prev) > 0 ) {
         pnode_prev=pnode_prev->prev;
-        steps++;
     }
 
     if (pnode_prev && pnode_prev != pnode->prev) {
@@ -289,11 +286,9 @@ void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
 }
 
 
-/* This function dis-promotes the position of the symbol in the list
-   after decrease its frequency.
-   Return 1 if element if removed from the list, otherwise 0 */
-int _freqlist_dispromote(freqlist *l, node_freqlist *pnode) {
-    node_freqlist *pnode1, *pnode2, *pnode3=NULL;
+/* This function dis-promotes the position of the symbol in the list */
+void _freqlist_dispromote(freqlist *l, node_freqlist *pnode) {
+    node_freqlist *pnode_next;
 
     /* If the node has freq=0 is removed from the list */
     if (pnode->freq == 0) {
@@ -301,83 +296,80 @@ int _freqlist_dispromote(freqlist *l, node_freqlist *pnode) {
             (pnode->next)->prev=pnode->prev;
         if (pnode->prev)
             (pnode->prev)->next=pnode->next;
-        pnode1=pnode->next;
+        pnode_next=pnode->next;
         if (pnode==l->list) {
-            l->list=pnode1;
+            l->list=pnode_next;
         }
         free(pnode);
-        while (pnode1) {
-            pnode1->pos--;
-            pnode1=pnode1->next;
+        while (pnode_next) {
+            pnode_next->pos--;
+            pnode_next=pnode_next->next;
         }
         l->length--;
-        return 1;
     }
 
-    pnode1=pnode;
-    pnode2=pnode1->next;
+    node_freqlist *pnode3=NULL;
+    pnode_next=pnode->next;
 
     /* While exist a next node with more frequency than pnode
        or have same frequency and its ASCII code greater ... */
-    while ( pnode2 && node_cmp(pnode1, pnode2) < 0 ) {
-        pnode3=pnode2;
-        pnode2=pnode2->next;
+    while (pnode_next && node_cmp(pnode, pnode_next) < 0 ) {
+        pnode3=pnode_next;
+        pnode_next=pnode_next->next;
     }
 
-    if (pnode2 && pnode2!=pnode1->next) {
+    if (pnode_next && pnode_next != pnode->next) {
         /* Previous and next of pnode1 point together */
-        (pnode1->next)->prev=pnode1->prev;
-        if (pnode1->prev)
-            (pnode1->prev)->next=pnode1->next;
+        (pnode->next)->prev=pnode->prev;
+        if (pnode->prev)
+            (pnode->prev)->next=pnode->next;
         /* pnode1 points at its news prev and next */
-        pnode1->next=pnode2;
-        pnode3=pnode1->prev;
-        pnode1->prev=pnode2->prev;
+        pnode->next=pnode_next;
+        pnode3=pnode->prev;
+        pnode->prev=pnode_next->prev;
         /* The new prev and next point to pnode1 */
-        pnode2->prev=pnode1;
-        (pnode1->prev)->next=pnode1;
+        pnode_next->prev=pnode;
+        (pnode->prev)->next=pnode;
 
         /* pnode1 is assigned to the position it has its prev */
-        pnode1->pos=(pnode1->prev)->pos;
+        pnode->pos=(pnode->prev)->pos;
         /* Decrease in 1 the pos variable of all nodes before pnode1 */
-        pnode2=pnode1;
-        while (pnode2->prev && pnode2->prev!=pnode3) {
-            pnode2=pnode2->prev;
-            pnode2->pos--;
+        pnode_next=pnode;
+        while (pnode_next->prev && pnode_next->prev != pnode3) {
+            pnode_next=pnode_next->prev;
+            pnode_next->pos--;
         }
     }
 
-    /* If pnode2 doesn't exist, means that will be the last in the list,
+    /* If pnode_next doesn't exist, means that will be the last in the list,
        but if pnode3 is null, means that was already before this iteration */
-    if (!pnode2 && pnode3) {
+    if (!pnode_next && pnode3) {
         /* Decrease in 1 the pos variable of all nodes before pnode1 */
-        pnode2=pnode1;
-        while (pnode2->next) {
-            pnode2=pnode2->next;
-            pnode2->pos--;
+        pnode_next=pnode;
+        while (pnode_next->next) {
+            pnode_next=pnode_next->next;
+            pnode_next->pos--;
         }
         /* pnode3 points at the last of the list */
-        pnode3->next=pnode1;
+        pnode3->next=pnode;
         /* Previous and next of pnode1 point together */
-        (pnode1->next)->prev=pnode1->prev;
-        if (pnode1->prev)
-            (pnode1->prev)->next=pnode1->next;
+        (pnode->next)->prev=pnode->prev;
+        if (pnode->prev)
+            (pnode->prev)->next=pnode->next;
         /* pnode1 points at its new prev */
-        pnode1->next=NULL;
-        pnode1->prev=pnode3;
-        pnode1->pos=pnode3->pos+1;
-
+        pnode->next=NULL;
+        pnode->prev=pnode3;
+        pnode->pos=pnode3->pos+1;
     }
 
     /* The symbol leaves the first position in the table, if it was */
-    if (pnode1->prev && l->list==pnode1) {
-        pnode2=pnode1->prev;
-        while (pnode2->prev) {
-            pnode2=pnode2->prev;
+    if (pnode->prev && l->list==pnode) {
+        pnode_next=pnode->prev;
+        while (pnode_next->prev) {
+            pnode_next=pnode_next->prev;
         }
-        l->list=pnode2;
+        l->list=pnode_next;
     }
-    return 0;
 }
 
 /*
