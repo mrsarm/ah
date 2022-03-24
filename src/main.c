@@ -172,16 +172,25 @@ ah_data* init_options(int argc, char *argv[]) {
 
 /* Ctrl+C handler */
 void ctrlc_handler(int sig) {
-    printf("\n");
-    if (data && data->freql && data->verbose) {
+    // If canceled and verbose mode is enabled,
+    // the tables and Huffman tree is printed out at least.
+    // If the process didn't start to record in the output
+    // file, no content will be recorded.
+    if (data && data->freql) {
         if (!data->decompres) {
             freqlist_sort(data->freql);
             freqlist_build_huff(data->freql);
-            freqlist_fprintf(stdout, VERBOSE_TABLE, data->freql);
-            fprintf(stderr, "\n");
+            if (data->verbose) {
+                freqlist_fprintf(stderr, VERBOSE_TABLE, data->freql);
+                fprintf(stderr, "\n");
+            }
         }
-        freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
+        if (data->verbose) {
+            freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
+        }
+        ah_data_free_resources(data);
     }
+    fprintf(stderr, "\n");
     exit(0);
 }
 
