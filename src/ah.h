@@ -64,13 +64,6 @@ int ah_data_init_resources(ah_data *data);
 
 
 /*
- * Initialization of input/output data structures
- * from the given file.
- */
-void ah_data_init_resources_fi(ah_data *data, FILE *fi);
-
-
-/*
  * Initialize the freql struct of data.
  */
 freqlist *ah_data_init_freql(ah_data *data);
