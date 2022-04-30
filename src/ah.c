@@ -161,18 +161,16 @@ int ah_count(ah_data *data) {
 void ah_encode(ah_data *data) {
     // Write "magic" number that identifies the format
     fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
-    //TODO Note that the use of sizeof is a bad idea to determine
-    //     the space used in a multiplatform tool
     // Write original input size in bytes
-    fwrite(&data->length_in, sizeof(data->length_in), 1, data->fo);
+    fwrite(&data->length_in, NUMBER_SIZE, 1, data->fo);
     // Write number of source symbols
-    fwrite(&data->freql->length, sizeof(data->freql->length), 1, data->fo);
+    fwrite(&data->freql->length, COUNT_SIZE, 1, data->fo);
     // Write each node from the freqlist
     node_freqlist *pnode = data->freql->list;
     while(pnode) {
-        fwrite(&pnode->symb, sizeof(pnode->symb), 1, data->fo);
-        fwrite(&pnode->bits, sizeof(pnode->bits), 1, data->fo);
-        fwrite(&pnode->nbits, sizeof(pnode->nbits), 1, data->fo);
+        fwrite(&pnode->symb, SYMBOL_SIZE, 1, data->fo);
+        fwrite(&pnode->bits, NUMBER_SIZE, 1, data->fo);
+        fwrite(&pnode->nbits, NUMBER_SIZE, 1, data->fo);
         pnode = pnode->next;
     }
     if (data->buffer_in) {
@@ -190,7 +188,7 @@ void ah_encode(ah_data *data) {
         // If nbits + pnode->nbits > 32, pull off a byte
         while(nbits + pnode->nbits > 32) {
             c = dword >> (nbits - 8);                   // Extract the 8 bits with higher
-            fwrite(&c, sizeof(c), 1, data->fo);         // order and write down into the file.
+            fwrite(&c, SYMBOL_SIZE, 1, data->fo);       // order and write down into the file.
             nbits -= 8;                                 // Now we have those 8 bits available
         }
         dword <<= pnode->nbits;                         // Make room for the new byte
@@ -200,7 +198,7 @@ void ah_encode(ah_data *data) {
     while(nbits > 0) {                                  // Extract the 4 bytes remaining in dword
         if(nbits>=8) c = dword >> (nbits - 8);
         else c = dword << (8 - nbits);
-        fwrite(&c, sizeof(c), 1, data->fo);
+        fwrite(&c, SYMBOL_SIZE, 1, data->fo);
         nbits -= 8;
     }
 }
@@ -223,18 +221,18 @@ int ah_decode(ah_data *data) {
         return INVALID_FILE_IN;
     }
     // Original input size in bytes
-    fread(&data->length_in, sizeof(data->length_in), 1, data->fi);
+    fread(&data->length_in, NUMBER_SIZE, 1, data->fi);
     if (data->length_in == 0) return 0; // Empty file
 
     // Number of source symbols
-    fread(&data->freql->length, sizeof(data->freql->length), 1, data->fi);
+    fread(&data->freql->length, COUNT_SIZE, 1, data->fi);
 
     for(unsigned int i = 0; i < data->freql->length; i++) {         // Read all elements
         node_freqlist* p = freqlist_create_node((unsigned char)0, (unsigned char)0, 0l);
         if (!p) return ERROR_MEM;
-        fread(&p->symb, sizeof(p->symb), 1, data->fi);           // Read node values
-        fread(&p->bits, sizeof(p->bits), 1, data->fi);
-        fread(&p->nbits, sizeof(p->nbits), 1, data->fi);
+        fread(&p->symb, SYMBOL_SIZE, 1, data->fi);           // Read node values
+        fread(&p->bits, NUMBER_SIZE, 1, data->fi);
+        fread(&p->nbits, NUMBER_SIZE, 1, data->fi);
         int j = 1 << (p->nbits-1);                                  // Insert node in place
         node_freqlist* q = data->freql->tree;
         while(j > 1) {
@@ -273,16 +271,16 @@ int ah_decode(ah_data *data) {
     unsigned long int bits = 0;
     unsigned char a;
     // Read the first 4 bytes in the double word bits
-    fread(&a, sizeof(a), 1, data->fi);
+    fread(&a, SYMBOL_SIZE, 1, data->fi);
     bits |= a;
     bits <<= 8;
-    fread(&a, sizeof(a), 1, data->fi);
+    fread(&a, SYMBOL_SIZE, 1, data->fi);
     bits |= a;
     bits <<= 8;
-    fread(&a, sizeof(a), 1, data->fi);
+    fread(&a, SYMBOL_SIZE, 1, data->fi);
     bits |= a;
     bits <<= 8;
-    fread(&a, sizeof(a), 1, data->fi);
+    fread(&a, SYMBOL_SIZE, 1, data->fi);
     bits |= a;
     int j = 0;      /* Each 8 bits another byte is read */
     node_freqlist* q = data->freql->tree;
@@ -292,7 +290,7 @@ int ah_decode(ah_data *data) {
         bits <<= 1;                                                 // Next bit
         j++;
         if(8 == j) {                                                // Each 8 bits
-            fread(&a, sizeof(a), 1, data->fi);                      // Read 1 byte from file
+            fread(&a, SYMBOL_SIZE, 1, data->fi);                    // Read 1 byte from file
             bits |= a;                                              // and insert in bits
             j = 0;                                                  // No holes
         }

@@ -42,6 +42,13 @@
 
 #define MAGIC_NUMBER                    "\x0f\xa1"  /* 2 bytes identifier of the file format */
 #define MAGIC_NUMBER_SIZE               2
+#define NUMBER_SIZE                     8       /* Bytes used to store big numbers in output
+                                                   (same than bytes used by the long int type
+                                                   in most platforms) */
+#define COUNT_SIZE                      4       /* Bytes used to store numbers in output to count
+                                                   (same than bytes used by the int type
+                                                   in most platforms) */
+#define SYMBOL_SIZE                     1       /* Bytes used by one symbol (one char) */
 
 
 #define DEPTH_BUFFER_SIZE               2048    /* 2K buffer used when printing the
