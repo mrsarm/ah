@@ -179,8 +179,6 @@ void freqlist_free(freqlist* l) {
  * in the list.
  */
 node_freqlist *freqlist_find(const freqlist *l, unsigned char c) {
-    /* TODO Check if the node exist with l.freqs[c] > 0
-            to be more efficient */
     node_freqlist *pnode = l->list;
     while (pnode && c!=pnode->symb) pnode=pnode->next;
     return pnode;
