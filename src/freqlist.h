@@ -28,13 +28,13 @@
 /*
  * Node element of the frequency list.
  *
- *   prev * node ( >= freq )
+ *   prev * node ( <= freq )
  *        ▲
  *        |
  *       node
  *        |
  *        ▼
- *   next * node ( <= freq )
+ *   next * node ( >= freq )
  *
  */
 typedef struct _node_freqlist
