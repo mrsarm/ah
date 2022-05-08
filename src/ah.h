@@ -83,12 +83,18 @@ int ah_count(ah_data *data);
 /*
  * Encode and write the compressed data.
  */
-void ah_encode(ah_data *data);
+int ah_encode(ah_data *data);
 
 /*
  * Decode and write the raw data.
  */
 int ah_decode(ah_data *data);
+
+/*
+ * Return the number of bytes to use to
+ * record a code of nbits.
+ */
+int coo_bits_bytes_size(unsigned char nbits);
 
 
 #endif /* __AH_H */

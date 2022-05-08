@@ -104,7 +104,17 @@ void compress() {
         freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
     }
 
-    ah_encode(data);                                    // Encode and write
+    r = ah_encode(data);                            // Encode and write
+    switch (r) {
+        case OK: break;
+        case ERROR_MEM:
+            error_mem((void*)ah_data_free_resources, data);
+        case INVALID_BITS_SIZE:
+            error_invalid_nbits((void*)ah_data_free_resources, data);
+        default:
+            error_unknown_code(r, "ah_encode", (void*)ah_data_free_resources, data);
+    }
+
 }
 
 /* Decompress input */
@@ -114,6 +124,8 @@ void decompress() {
         case OK: break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
+        case INVALID_BITS_SIZE:
+            error_invalid_nbits((void*)ah_data_free_resources, data);
         case INVALID_FILE_IN:
             error_invalid_file_in(r, "input", data->filename_in, (void*)ah_data_free_resources, data);
         default:

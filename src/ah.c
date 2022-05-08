@@ -158,19 +158,35 @@ int ah_count(ah_data *data) {
 /*
  * Encode and write the compressed data.
  */
-void ah_encode(ah_data *data) {
+int ah_encode(ah_data *data) {
     // Write "magic" number that identifies the format
     fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
     // Write original input size in bytes
     fwrite(&data->length_in, NUMBER_SIZE, 1, data->fo);
     // Write number of source symbols
-    fwrite(&data->freql->length, COUNT_SIZE, 1, data->fo);
+    unsigned short int length = data->freql->length;
+    fwrite(&length, SMALL_COUNT_SIZE, 1, data->fo);
     // Write each node from the freqlist
     node_freqlist *pnode = data->freql->list;
     while(pnode) {
         fwrite(&pnode->symb, SYMBOL_SIZE, 1, data->fo);
-        fwrite(&pnode->bits, NUMBER_SIZE, 1, data->fo);
         fwrite(&pnode->nbits, SYMBOL_SIZE, 1, data->fo);
+        // Write each symbol "bits" with as fewer bits as possible
+        int bytes_size = coo_bits_bytes_size(pnode->nbits);
+        if (bytes_size == 1) {
+            unsigned char bits = (unsigned char) pnode->bits;
+            fwrite(&bits, bytes_size, 1, data->fo);
+        } else if (bytes_size == 2) {
+            unsigned short bits = (unsigned short) pnode->bits;
+            fwrite(&bits, bytes_size, 1, data->fo);
+        } else if (bytes_size == 4) {
+            unsigned int bits = (unsigned int) pnode->bits;
+            fwrite(&bits, bytes_size, 1, data->fo);
+        } else if (bytes_size == 8) {
+            fwrite(&pnode->bits, bytes_size, 1, data->fo);
+        } else {
+            return INVALID_BITS_SIZE;
+        }
         pnode = pnode->next;
     }
     if (data->buffer_in) {
@@ -201,6 +217,7 @@ void ah_encode(ah_data *data) {
         fwrite(&c, SYMBOL_SIZE, 1, data->fo);
         nbits -= 8;
     }
+    return 0;
 }
 
 /*
@@ -225,14 +242,32 @@ int ah_decode(ah_data *data) {
     if (data->length_in == 0) return 0; // Empty file
 
     // Number of source symbols
-    fread(&data->freql->length, COUNT_SIZE, 1, data->fi);
+    unsigned short int length;
+    fread(&length, SMALL_COUNT_SIZE, 1, data->fi);
+    data->freql->length = length;
 
     for(unsigned int i = 0; i < data->freql->length; i++) {         // Read all elements
         node_freqlist* p = freqlist_create_node((unsigned char)0, (unsigned char)0, 0l);
         if (!p) return ERROR_MEM;
         fread(&p->symb, SYMBOL_SIZE, 1, data->fi);                  // Read node values
-        fread(&p->bits, NUMBER_SIZE, 1, data->fi);
         fread(&p->nbits, SYMBOL_SIZE, 1, data->fi);
+        int bytes_size = coo_bits_bytes_size(p->nbits);
+        if (bytes_size == 1) {
+            unsigned char bits;
+            fread(&bits, bytes_size, 1, data->fi);
+            p->bits = bits;
+        } else if (bytes_size == 2) {
+            unsigned short bits;
+            fread(&bits, bytes_size, 1, data->fi);
+            p->bits = bits;
+        } else if (bytes_size == 4) {
+            unsigned int bits;
+            fread(&bits, bytes_size, 1, data->fi);
+        } else if (bytes_size == 8) {
+            fread(&p->bits, bytes_size, 1, data->fi);
+        } else {
+            return INVALID_BITS_SIZE;
+        }
         int j = 1 << (p->nbits-1);                                  // Insert node in place
         node_freqlist* q = data->freql->tree;
         while(j > 1) {
@@ -310,4 +345,16 @@ int ah_decode(ah_data *data) {
     } while(data->length_in);                                       // Until file is over
 
     return 0;
+}
+
+/*
+ * Return the number of bytes to use to
+ * record a code of nbits.
+ */
+int coo_bits_bytes_size(unsigned char nbits) {
+    if (nbits <= 8) return 1;
+    if (nbits <= 16) return 2;
+    if (nbits <= 32) return 4;
+    if (nbits <= 64) return 8;
+    return -1;  // Overflow, should never reach this
 }

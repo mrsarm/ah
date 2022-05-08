@@ -36,6 +36,7 @@
                                                    be opened. */
 #define ERROR_FILE_OUT                  6       /* Cannot open output file */
 #define INVALID_FILE_IN                 7       /* Cannot open output file */
+#define INVALID_BITS_SIZE               8       /* Invalid number of bits to encode a symbol */
 #define ERROR_UNKNOWN                   50      /* Unknown error */
 
 #define OUTPUT_EXT                      ".ah"   /* Default output file name extension. */
@@ -44,6 +45,9 @@
 #define MAGIC_NUMBER_SIZE               2
 #define NUMBER_SIZE                     8       /* Bytes used to store big numbers in output
                                                    (same than bytes used by the long int type
+                                                   in most platforms) */
+#define SMALL_COUNT_SIZE                2       /* Bytes used to store short numbers in output
+                                                   to count (same than bytes used by the short type
                                                    in most platforms) */
 #define COUNT_SIZE                      4       /* Bytes used to store numbers in output to count
                                                    (same than bytes used by the int type
