@@ -274,18 +274,18 @@ int ah_decode(ah_data *data) {
     if (!feof(data->fi)) {
         fread(&a, SYMBOL_SIZE, 1, data->fi);
         bits |= a;
-        bits <<= 8;
     }
+    bits <<= 8;
     if (!feof(data->fi)) {
         fread(&a, SYMBOL_SIZE, 1, data->fi);
         bits |= a;
-        bits <<= 8;
     }
+    bits <<= 8;
     if (!feof(data->fi)) {
         fread(&a, SYMBOL_SIZE, 1, data->fi);
         bits |= a;
-        bits <<= 8;
     }
+    bits <<= 8;
     if (!feof(data->fi)) {
         fread(&a, SYMBOL_SIZE, 1, data->fi);
         bits |= a;

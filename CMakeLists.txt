@@ -69,6 +69,8 @@ if(BASH_PROGRAM)
             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_empty_stream.sh)
     add_test(test_enc_one_byte_stream
             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_one_byte_stream.sh)
+    add_test(test_enc_two_bytes_stream
+            ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_two_bytes_stream.sh)
     add_test(test_enc_random_stream
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_random_stream.sh)
     add_test(test_verbose
