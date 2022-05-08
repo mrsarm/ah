@@ -170,7 +170,7 @@ void ah_encode(ah_data *data) {
     while(pnode) {
         fwrite(&pnode->symb, SYMBOL_SIZE, 1, data->fo);
         fwrite(&pnode->bits, NUMBER_SIZE, 1, data->fo);
-        fwrite(&pnode->nbits, NUMBER_SIZE, 1, data->fo);
+        fwrite(&pnode->nbits, SYMBOL_SIZE, 1, data->fo);
         pnode = pnode->next;
     }
     if (data->buffer_in) {
@@ -230,9 +230,9 @@ int ah_decode(ah_data *data) {
     for(unsigned int i = 0; i < data->freql->length; i++) {         // Read all elements
         node_freqlist* p = freqlist_create_node((unsigned char)0, (unsigned char)0, 0l);
         if (!p) return ERROR_MEM;
-        fread(&p->symb, SYMBOL_SIZE, 1, data->fi);           // Read node values
+        fread(&p->symb, SYMBOL_SIZE, 1, data->fi);                  // Read node values
         fread(&p->bits, NUMBER_SIZE, 1, data->fi);
-        fread(&p->nbits, NUMBER_SIZE, 1, data->fi);
+        fread(&p->nbits, SYMBOL_SIZE, 1, data->fi);
         int j = 1 << (p->nbits-1);                                  // Insert node in place
         node_freqlist* q = data->freql->tree;
         while(j > 1) {
