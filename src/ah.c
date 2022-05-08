@@ -269,19 +269,27 @@ int ah_decode(ah_data *data) {
 
     // Read compressed data and extract to the output stream
     unsigned long int bits = 0;
-    unsigned char a;
+    unsigned char a = 0;
     // Read the first 4 bytes in the double word bits
-    fread(&a, SYMBOL_SIZE, 1, data->fi);
-    bits |= a;
-    bits <<= 8;
-    fread(&a, SYMBOL_SIZE, 1, data->fi);
-    bits |= a;
-    bits <<= 8;
-    fread(&a, SYMBOL_SIZE, 1, data->fi);
-    bits |= a;
-    bits <<= 8;
-    fread(&a, SYMBOL_SIZE, 1, data->fi);
-    bits |= a;
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+        bits <<= 8;
+    }
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+        bits <<= 8;
+    }
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+        bits <<= 8;
+    }
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+    }
     int j = 0;      /* Each 8 bits another byte is read */
     node_freqlist* q = data->freql->tree;
 
