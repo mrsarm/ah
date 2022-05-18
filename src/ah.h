@@ -41,6 +41,8 @@ typedef struct _ah_data {
     freqlist *freql;            /* Frequency list of characters */
     int decompres;              /* If TRUE is decompression */
     int verbose;                /* If TRUE the verbose mode is activated */
+    unsigned char               /* Flags to store in the output */
+        header_flags[2];        /* header with info about the file */
 } ah_data;
 
 

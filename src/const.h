@@ -42,6 +42,9 @@
 #define OUTPUT_EXT                      ".ah"   /* Default output file name extension. */
 
 #define MAGIC_NUMBER                    "\x0f\xa1"  /* 2 bytes identifier of the file format */
+#define HEADER_COO_VERSION              1       /* Version of the format used */
+#define HEADER_COO_VERSION_BITS         3       /* Bits used in the header to store the version
+                                                   of the format used */
 #define MAGIC_NUMBER_SIZE               2
 #define NUMBER_SIZE                     8       /* Bytes used to store big numbers in output
                                                    (same than bytes used by the long int type

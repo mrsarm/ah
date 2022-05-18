@@ -28,6 +28,10 @@
 #include "util.h"
 
 
+#define VERSION_BYTE    HEADER_COO_VERSION << (8 - HEADER_COO_VERSION_BITS)
+#define FLAGS_1_BYTE    0
+
+
 /*
  * Return ah_data struct initialized with
  * default values.
@@ -43,6 +47,8 @@ ah_data *ah_data_init(void) {
         data->length_buff = 0;
         data->freql = NULL;
         data->length_in = 0l;
+        data->header_flags[0] = 0;
+        data->header_flags[1] = 0;
     }
     return data;
 }
@@ -85,6 +91,9 @@ int ah_data_init_resources(ah_data *data) {
         data->length_buff = BUFFER_WINDOW;
         data->fo = fdopen(dup(fileno(stdout)), "wb");
     }
+    // For now only the version of the format is stored in the flags byte
+    data->header_flags[0] = VERSION_BYTE;
+    data->header_flags[1] = FLAGS_1_BYTE;
     return 0;
 }
 
@@ -161,6 +170,9 @@ int ah_count(ah_data *data) {
 int ah_encode(ah_data *data) {
     // Write "magic" number that identifies the format
     fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
+    // Write basic header info
+    fputc(data->header_flags[0], data->fo);
+    fputc(data->header_flags[1], data->fo);
     // Write original input size in bytes
     fwrite(&data->length_in, NUMBER_SIZE, 1, data->fo);
     // Write number of source symbols
@@ -236,6 +248,14 @@ int ah_decode(ah_data *data) {
     fread(&magic_number, MAGIC_NUMBER_SIZE, 1, data->fi);
     if (strcmp(magic_number, MAGIC_NUMBER) != 0) {
         return INVALID_FILE_IN;
+    }
+    data->header_flags[0] = fgetc(data->fi);
+    if (data->header_flags[0] != VERSION_BYTE) {
+        return INVALID_FILE_IN;     // Different version not supported?
+    }
+    data->header_flags[1] = fgetc(data->fi);
+    if (data->header_flags[1] != FLAGS_1_BYTE) {
+        return INVALID_FILE_IN;     // New flags not supported?
     }
     // Original input size in bytes
     fread(&data->length_in, NUMBER_SIZE, 1, data->fi);
