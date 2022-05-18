@@ -146,7 +146,7 @@ int freqlist_sort(freqlist *l);
  * codes for encoding.
  * The freqlist has to be sorted first.
  */
-void freqlist_build_huff(freqlist *l);
+int freqlist_build_huff(freqlist *l);
 
 
 /*

@@ -97,7 +97,9 @@ void compress() {
             error_unknown_code(r, "ah_count", (void*)ah_data_free_resources, data);
     }
 
-    freqlist_build_huff(data->freql);                   // Build Huffman tree
+    r = freqlist_build_huff(data->freql);               // Build Huffman tree
+    if (r == ERROR_MEM)
+        error_mem((void*)ah_data_free_resources, data);
     if (data->verbose) {
         freqlist_fprintf(stderr, VERBOSE_TABLE, data->freql);
         fprintf(stderr, "\n");
@@ -191,7 +193,9 @@ void ctrlc_handler(int sig) {
     if (data && data->freql) {
         if (!data->decompres) {
             freqlist_sort(data->freql);
-            freqlist_build_huff(data->freql);
+            int r = freqlist_build_huff(data->freql);
+            if (r == ERROR_MEM)
+                error_mem((void*)ah_data_free_resources, data);
             if (data->verbose) {
                 freqlist_fprintf(stderr, VERBOSE_TABLE, data->freql);
                 fprintf(stderr, "\n");

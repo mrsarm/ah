@@ -461,8 +461,8 @@ void _build_binary_code(node_freqlist *n, int len, int v)
  * codes for encoding.
  * The freqlist has to be sorted first.
  */
-void freqlist_build_huff(freqlist *l) {
-    if (!l->list) return;
+int freqlist_build_huff(freqlist *l) {
+    if (!l->list) return 0;
     l->tree = l->list;
     node_freqlist *p = l->list;
     do {
@@ -471,6 +471,7 @@ void freqlist_build_huff(freqlist *l) {
     } while (p);
     while (l->tree && l->tree->tnext) {              // While exist at least 2 elements in the list
         p = (node_freqlist *)malloc(sizeof(node_freqlist));     // A new tree node (that is a sub-tree)
+        if (!p) return ERROR_MEM;
         p->symb = 0;                                            // Does not correspond to any symbol
         p->one = l->tree;                                       // Branch one
         l->tree = l->tree->tnext;                               // Next node
@@ -480,6 +481,7 @@ void freqlist_build_huff(freqlist *l) {
         _insert_order(&(l->tree), p);                           // Insert in new node
     }
     _build_binary_code(l->tree, 0, 0);
+    return 0;
 }
 
 
