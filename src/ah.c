@@ -267,7 +267,7 @@ int ah_decode(ah_data *data) {
     data->freql->length = length;
 
     for(unsigned int i = 0; i < data->freql->length; i++) {         // Read all elements
-        node_freqlist* p = freqlist_create_node((unsigned char)0, (unsigned char)0, 0l);
+        node_freqlist* p = freqlist_create_node(0, 0, 0l);
         if (!p) return ERROR_MEM;
         fread(&p->symb, SYMBOL_SIZE, 1, data->fi);                  // Read node values
         fread(&p->nbits, SYMBOL_SIZE, 1, data->fi);
@@ -349,20 +349,20 @@ int ah_decode(ah_data *data) {
     node_freqlist* q = data->freql->tree;
 
     do {
-        if(bits & 0x80000000) q = q->one; else q = q->zero;         // Right branch
+        if (bits & 0x80000000) q = q->one; else q = q->zero;        // Right branch
         bits <<= 1;                                                 // Next bit
         j++;
-        if(8 == j) {                                                // Each 8 bits
+        if (8 == j) {                                               // Each 8 bits
             fread(&a, SYMBOL_SIZE, 1, data->fi);                    // Read 1 byte from file
             bits |= a;                                              // and insert in bits
             j = 0;                                                  // No holes
         }
-        if(!q->one && !q->zero) {                                   // If node is a symbol
+        if (!q->one && !q->zero) {                                  // If node is a symbol
             putc(q->symb, data->fo);                                // write down to the file
             data->length_in--;                                      // Update remaining length
             q=data->freql->tree;                                    // Back to the tree's root
         }
-    } while(data->length_in);                                       // Until file is over
+    } while (data->length_in);                                      // Until file is over
 
     return 0;
 }
