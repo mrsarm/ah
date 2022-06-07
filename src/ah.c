@@ -323,7 +323,7 @@ int ah_decode(ah_data *data) {
     }
 
     // Read compressed data and extract to the output stream
-    unsigned long int bits = 0;
+    unsigned int bits = 0;
     unsigned char a = 0;
     // Read the first 4 bytes in the double word bits
     if (!feof(data->fi)) {

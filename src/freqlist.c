@@ -481,7 +481,7 @@ int freqlist_build_huff(freqlist *l) {
         _insert_order(&(l->tree), p);                           // Insert in new node
     }
     _build_binary_code(l->tree, 0, 0);
-    return 0;
+    return OK;
 }
 
 
