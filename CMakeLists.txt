@@ -73,6 +73,10 @@ if(BASH_PROGRAM)
             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_two_bytes_stream.sh)
     add_test(test_enc_random_stream
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_random_stream.sh)
+    add_test(test_enc_text_file
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_text_file.sh)
+    add_test(test_enc_bin_file
+             ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_enc_bin_file.sh)
     add_test(test_verbose
              ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/scripts/test_verbose.sh)
 endif(BASH_PROGRAM)
