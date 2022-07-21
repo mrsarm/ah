@@ -35,7 +35,8 @@ ah_data* count_buff(unsigned char* buff_in, unsigned int buff_in_length, int ver
     }
     data->verbose = verbose;
     // Initialize with a memory stream
-    ah_data_init_resources_fi(data, fmemopen(buff_in, buff_in_length, "rb"));
+    data->fi = fmemopen(buff_in, buff_in_length, "rb");
+    data->length_in = 0l;
 
     int r = ah_count(data);
     switch (r) {

@@ -1,6 +1,6 @@
 /* const.h
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -36,12 +36,26 @@
                                                    be opened. */
 #define ERROR_FILE_OUT                  6       /* Cannot open output file */
 #define INVALID_FILE_IN                 7       /* Cannot open output file */
+#define INVALID_BITS_SIZE               8       /* Invalid number of bits to encode a symbol */
 #define ERROR_UNKNOWN                   50      /* Unknown error */
 
 #define OUTPUT_EXT                      ".ah"   /* Default output file name extension. */
 
 #define MAGIC_NUMBER                    "\x0f\xa1"  /* 2 bytes identifier of the file format */
+#define HEADER_COO_VERSION              1       /* Version of the format used */
+#define HEADER_COO_VERSION_BITS         3       /* Bits used in the header to store the version
+                                                   of the format used */
 #define MAGIC_NUMBER_SIZE               2
+#define NUMBER_SIZE                     8       /* Bytes used to store big numbers in output
+                                                   (same than bytes used by the long int type
+                                                   in most platforms) */
+#define SMALL_COUNT_SIZE                2       /* Bytes used to store short numbers in output
+                                                   to count (same than bytes used by the short type
+                                                   in most platforms) */
+#define COUNT_SIZE                      4       /* Bytes used to store numbers in output to count
+                                                   (same than bytes used by the int type
+                                                   in most platforms) */
+#define SYMBOL_SIZE                     1       /* Bytes used by one symbol (one char) */
 
 
 #define DEPTH_BUFFER_SIZE               2048    /* 2K buffer used when printing the

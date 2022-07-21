@@ -1,6 +1,6 @@
 /* ah.h
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -41,6 +41,8 @@ typedef struct _ah_data {
     freqlist *freql;            /* Frequency list of characters */
     int decompres;              /* If TRUE is decompression */
     int verbose;                /* If TRUE the verbose mode is activated */
+    unsigned char               /* Flags to store in the output */
+        header_flags[2];        /* header with info about the file */
 } ah_data;
 
 
@@ -64,13 +66,6 @@ int ah_data_init_resources(ah_data *data);
 
 
 /*
- * Initialization of input/output data structures
- * from the given file.
- */
-void ah_data_init_resources_fi(ah_data *data, FILE *fi);
-
-
-/*
  * Initialize the freql struct of data.
  */
 freqlist *ah_data_init_freql(ah_data *data);
@@ -90,12 +85,18 @@ int ah_count(ah_data *data);
 /*
  * Encode and write the compressed data.
  */
-void ah_encode(ah_data *data);
+int ah_encode(ah_data *data);
 
 /*
  * Decode and write the raw data.
  */
 int ah_decode(ah_data *data);
+
+/*
+ * Return the number of bytes to use to
+ * record a code of nbits.
+ */
+int coo_bits_bytes_size(unsigned char nbits);
 
 
 #endif /* __AH_H */

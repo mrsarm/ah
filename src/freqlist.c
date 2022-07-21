@@ -1,6 +1,6 @@
 /* freqlist.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -141,6 +141,7 @@ node_freqlist* freqlist_create_node(unsigned char c,
     return pnode;
 }
 
+/* free the memory of all the nodes of the list */
 void _freqlist_free_list(node_freqlist *list) {
     node_freqlist *pnode, *pnode_prev;
     pnode = list;
@@ -151,10 +152,14 @@ void _freqlist_free_list(node_freqlist *list) {
     }
 }
 
+/* free the memory of all the "intermediate" nodes of the tree.
+   To free the nodes that hold symbols (leaves) use _freqlist_free_list */
 void _freqlist_free_tree(node_freqlist *tree) {
     if(tree->zero) _freqlist_free_tree(tree->zero);
     if(tree->one)  _freqlist_free_tree(tree->one);
-    free(tree);
+    if (tree->zero || tree->one) {
+        free(tree);
+    }
 }
 
 /*
@@ -163,9 +168,8 @@ void _freqlist_free_tree(node_freqlist *tree) {
 void freqlist_free(freqlist* l) {
     if (l->tree) {
         _freqlist_free_tree(l->tree);
-    } else {
-        _freqlist_free_list(l->list);
     }
+    _freqlist_free_list(l->list);
     free(l);
 }
 
@@ -175,8 +179,6 @@ void freqlist_free(freqlist* l) {
  * in the list.
  */
 node_freqlist *freqlist_find(const freqlist *l, unsigned char c) {
-    /* TODO Check if the node exist with l.freqs[c] > 0
-            to be more efficient */
     node_freqlist *pnode = l->list;
     while (pnode && c!=pnode->symb) pnode=pnode->next;
     return pnode;
@@ -193,10 +195,6 @@ node_freqlist *freqlist_find(const freqlist *l, unsigned char c) {
 node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
     node_freqlist *pnode1, *pnode_prev = NULL;
 
-    /* This function promotes the position of the symbol in the list
-       after increase its frequency, or being created. */
-    void _freqlist_promote(freqlist *l, node_freqlist *pnode);
-
     pnode1=l->list;
     while (pnode1 && c!=pnode1->symb) {
         pnode_prev=pnode1;
@@ -211,8 +209,7 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
     }
 
     /* If the element doesn't exist, it's added to the end of the list,
-       with frequency=1, and is promoted in the list with the same
-       promotion algorithm. */
+       with frequency=1. */
     pnode1 = freqlist_create_node(c, 0, 1l);
     if (pnode1) {
         l->size++;
@@ -221,7 +218,6 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
             pnode1->pos=pnode_prev->pos + 1;
             pnode1->prev=pnode_prev;
             pnode_prev->next=pnode1;
-            _freqlist_promote(l, pnode1);
         } else {
             l->list=pnode1; // First element in the list
         }
@@ -230,11 +226,9 @@ node_freqlist *freqlist_add(freqlist *l, unsigned char c) {
 }
 
 
-/* Promote the position of the symbol in the list
-   (called after its frequency was increased, or after being created. */
+/* Promote the position of the symbol in the list */
 void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
     unsigned char i;
-    int steps = 0;      /* num of elements walked until reached new pos */
 
     node_freqlist *pnode_prev=pnode->prev,
                   *pnode_next;
@@ -243,7 +237,6 @@ void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
        or have the same frequency but a lower ASCII code ... */
     while (pnode_prev && node_cmp(pnode, pnode_prev) > 0 ) {
         pnode_prev=pnode_prev->prev;
-        steps++;
     }
 
     if (pnode_prev && pnode_prev != pnode->prev) {
@@ -291,11 +284,9 @@ void _freqlist_promote(freqlist *l, node_freqlist *pnode) {
 }
 
 
-/* This function dis-promotes the position of the symbol in the list
-   after decrease its frequency.
-   Return 1 if element if removed from the list, otherwise 0 */
-int _freqlist_dispromote(freqlist *l, node_freqlist *pnode) {
-    node_freqlist *pnode1, *pnode2, *pnode3=NULL;
+/* This function dis-promotes the position of the symbol in the list */
+void _freqlist_dispromote(freqlist *l, node_freqlist *pnode) {
+    node_freqlist *pnode_next;
 
     /* If the node has freq=0 is removed from the list */
     if (pnode->freq == 0) {
@@ -303,83 +294,80 @@ int _freqlist_dispromote(freqlist *l, node_freqlist *pnode) {
             (pnode->next)->prev=pnode->prev;
         if (pnode->prev)
             (pnode->prev)->next=pnode->next;
-        pnode1=pnode->next;
+        pnode_next=pnode->next;
         if (pnode==l->list) {
-            l->list=pnode1;
+            l->list=pnode_next;
         }
         free(pnode);
-        while (pnode1) {
-            pnode1->pos--;
-            pnode1=pnode1->next;
+        while (pnode_next) {
+            pnode_next->pos--;
+            pnode_next=pnode_next->next;
         }
         l->length--;
-        return 1;
     }
 
-    pnode1=pnode;
-    pnode2=pnode1->next;
+    node_freqlist *pnode3=NULL;
+    pnode_next=pnode->next;
 
     /* While exist a next node with more frequency than pnode
        or have same frequency and its ASCII code greater ... */
-    while ( pnode2 && node_cmp(pnode1, pnode2) < 0 ) {
-        pnode3=pnode2;
-        pnode2=pnode2->next;
+    while (pnode_next && node_cmp(pnode, pnode_next) < 0 ) {
+        pnode3=pnode_next;
+        pnode_next=pnode_next->next;
     }
 
-    if (pnode2 && pnode2!=pnode1->next) {
+    if (pnode_next && pnode_next != pnode->next) {
         /* Previous and next of pnode1 point together */
-        (pnode1->next)->prev=pnode1->prev;
-        if (pnode1->prev)
-            (pnode1->prev)->next=pnode1->next;
+        (pnode->next)->prev=pnode->prev;
+        if (pnode->prev)
+            (pnode->prev)->next=pnode->next;
         /* pnode1 points at its news prev and next */
-        pnode1->next=pnode2;
-        pnode3=pnode1->prev;
-        pnode1->prev=pnode2->prev;
+        pnode->next=pnode_next;
+        pnode3=pnode->prev;
+        pnode->prev=pnode_next->prev;
         /* The new prev and next point to pnode1 */
-        pnode2->prev=pnode1;
-        (pnode1->prev)->next=pnode1;
+        pnode_next->prev=pnode;
+        (pnode->prev)->next=pnode;
 
         /* pnode1 is assigned to the position it has its prev */
-        pnode1->pos=(pnode1->prev)->pos;
+        pnode->pos=(pnode->prev)->pos;
         /* Decrease in 1 the pos variable of all nodes before pnode1 */
-        pnode2=pnode1;
-        while (pnode2->prev && pnode2->prev!=pnode3) {
-            pnode2=pnode2->prev;
-            pnode2->pos--;
+        pnode_next=pnode;
+        while (pnode_next->prev && pnode_next->prev != pnode3) {
+            pnode_next=pnode_next->prev;
+            pnode_next->pos--;
         }
     }
 
-    /* If pnode2 doesn't exist, means that will be the last in the list,
+    /* If pnode_next doesn't exist, means that will be the last in the list,
        but if pnode3 is null, means that was already before this iteration */
-    if (!pnode2 && pnode3) {
+    if (!pnode_next && pnode3) {
         /* Decrease in 1 the pos variable of all nodes before pnode1 */
-        pnode2=pnode1;
-        while (pnode2->next) {
-            pnode2=pnode2->next;
-            pnode2->pos--;
+        pnode_next=pnode;
+        while (pnode_next->next) {
+            pnode_next=pnode_next->next;
+            pnode_next->pos--;
         }
         /* pnode3 points at the last of the list */
-        pnode3->next=pnode1;
+        pnode3->next=pnode;
         /* Previous and next of pnode1 point together */
-        (pnode1->next)->prev=pnode1->prev;
-        if (pnode1->prev)
-            (pnode1->prev)->next=pnode1->next;
+        (pnode->next)->prev=pnode->prev;
+        if (pnode->prev)
+            (pnode->prev)->next=pnode->next;
         /* pnode1 points at its new prev */
-        pnode1->next=NULL;
-        pnode1->prev=pnode3;
-        pnode1->pos=pnode3->pos+1;
-
+        pnode->next=NULL;
+        pnode->prev=pnode3;
+        pnode->pos=pnode3->pos+1;
     }
 
     /* The symbol leaves the first position in the table, if it was */
-    if (pnode1->prev && l->list==pnode1) {
-        pnode2=pnode1->prev;
-        while (pnode2->prev) {
-            pnode2=pnode2->prev;
+    if (pnode->prev && l->list==pnode) {
+        pnode_next=pnode->prev;
+        while (pnode_next->prev) {
+            pnode_next=pnode_next->prev;
         }
-        l->list=pnode2;
+        l->list=pnode_next;
     }
-    return 0;
 }
 
 /*
@@ -447,7 +435,7 @@ void _insert_order(node_freqlist** head, node_freqlist *e) {
     node_freqlist *p = *head, *a = NULL;
     // Find the symbol in the list (sorted by freq)
     while(p && p->freq < e->freq) {
-        a = p;                  // Keep the current element to insert
+        a = p;                  // Keep the current element to insert after
         p = p->tnext;
     }
     // Insert the element
@@ -471,18 +459,19 @@ void _build_binary_code(node_freqlist *n, int len, int v)
 /*
  * Build the Huffman tree and binary
  * codes for encoding.
- * The freqlist needs to be sorted first.
+ * The freqlist has to be sorted first.
  */
-void freqlist_build_huff(freqlist *l) { // while inside main
-    if (!l->list) return;
+int freqlist_build_huff(freqlist *l) {
+    if (!l->list) return 0;
     l->tree = l->list;
     node_freqlist *p = l->list;
-    while (p->next) {
+    do {
         p->tnext = p->next;
         p = p->next;
-    }
-    while(l->tree && l->tree->tnext) {               // While exist at least 2 elements in the list
+    } while (p);
+    while (l->tree && l->tree->tnext) {              // While exist at least 2 elements in the list
         p = (node_freqlist *)malloc(sizeof(node_freqlist));     // A new tree node (that is a sub-tree)
+        if (!p) return ERROR_MEM;
         p->symb = 0;                                            // Does not correspond to any symbol
         p->one = l->tree;                                       // Branch one
         l->tree = l->tree->tnext;                               // Next node
@@ -492,6 +481,7 @@ void freqlist_build_huff(freqlist *l) { // while inside main
         _insert_order(&(l->tree), p);                           // Insert in new node
     }
     _build_binary_code(l->tree, 0, 0);
+    return OK;
 }
 
 

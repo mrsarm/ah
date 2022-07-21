@@ -1,6 +1,6 @@
 /* ah.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -28,6 +28,10 @@
 #include "util.h"
 
 
+#define VERSION_BYTE    HEADER_COO_VERSION << (8 - HEADER_COO_VERSION_BITS)
+#define FLAGS_1_BYTE    0
+
+
 /*
  * Return ah_data struct initialized with
  * default values.
@@ -43,6 +47,8 @@ ah_data *ah_data_init(void) {
         data->length_buff = 0;
         data->freql = NULL;
         data->length_in = 0l;
+        data->header_flags[0] = 0;
+        data->header_flags[1] = 0;
     }
     return data;
 }
@@ -85,17 +91,10 @@ int ah_data_init_resources(ah_data *data) {
         data->length_buff = BUFFER_WINDOW;
         data->fo = fdopen(dup(fileno(stdout)), "wb");
     }
+    // For now only the version of the format is stored in the flags byte
+    data->header_flags[0] = VERSION_BYTE;
+    data->header_flags[1] = FLAGS_1_BYTE;
     return 0;
-}
-
-
-/*
- * Initialization of input/output data structures
- * from the given file.
- */
-void ah_data_init_resources_fi(ah_data *data, FILE *fi) {
-    data->fi = fi;
-    data->length_in = 0l;
 }
 
 
@@ -168,21 +167,38 @@ int ah_count(ah_data *data) {
 /*
  * Encode and write the compressed data.
  */
-void ah_encode(ah_data *data) {
+int ah_encode(ah_data *data) {
     // Write "magic" number that identifies the format
     fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
-    //TODO Note that the use of sizeof is a bad idea to determine
-    //     the space used in a multiplatform tool
+    // Write basic header info
+    fputc(data->header_flags[0], data->fo);
+    fputc(data->header_flags[1], data->fo);
     // Write original input size in bytes
-    fwrite(&data->length_in, sizeof(data->length_in), 1, data->fo);
+    fwrite(&data->length_in, NUMBER_SIZE, 1, data->fo);
     // Write number of source symbols
-    fwrite(&data->freql->length, sizeof(data->freql->length), 1, data->fo);
+    unsigned short int length = data->freql->length;
+    fwrite(&length, SMALL_COUNT_SIZE, 1, data->fo);
     // Write each node from the freqlist
     node_freqlist *pnode = data->freql->list;
     while(pnode) {
-        fwrite(&pnode->symb, sizeof(pnode->symb), 1, data->fo);
-        fwrite(&pnode->bits, sizeof(pnode->bits), 1, data->fo);
-        fwrite(&pnode->nbits, sizeof(pnode->nbits), 1, data->fo);
+        fwrite(&pnode->symb, SYMBOL_SIZE, 1, data->fo);
+        fwrite(&pnode->nbits, SYMBOL_SIZE, 1, data->fo);
+        // Write each symbol "bits" with as fewer bits as possible
+        int bytes_size = coo_bits_bytes_size(pnode->nbits);
+        if (bytes_size == 1) {
+            unsigned char bits = (unsigned char) pnode->bits;
+            fwrite(&bits, bytes_size, 1, data->fo);
+        } else if (bytes_size == 2) {
+            unsigned short bits = (unsigned short) pnode->bits;
+            fwrite(&bits, bytes_size, 1, data->fo);
+        } else if (bytes_size == 4) {
+            unsigned int bits = (unsigned int) pnode->bits;
+            fwrite(&bits, bytes_size, 1, data->fo);
+        } else if (bytes_size == 8) {
+            fwrite(&pnode->bits, bytes_size, 1, data->fo);
+        } else {
+            return INVALID_BITS_SIZE;
+        }
         pnode = pnode->next;
     }
     if (data->buffer_in) {
@@ -200,7 +216,7 @@ void ah_encode(ah_data *data) {
         // If nbits + pnode->nbits > 32, pull off a byte
         while(nbits + pnode->nbits > 32) {
             c = dword >> (nbits - 8);                   // Extract the 8 bits with higher
-            fwrite(&c, sizeof(c), 1, data->fo);         // order and write down into the file.
+            fwrite(&c, SYMBOL_SIZE, 1, data->fo);       // order and write down into the file.
             nbits -= 8;                                 // Now we have those 8 bits available
         }
         dword <<= pnode->nbits;                         // Make room for the new byte
@@ -210,9 +226,10 @@ void ah_encode(ah_data *data) {
     while(nbits > 0) {                                  // Extract the 4 bytes remaining in dword
         if(nbits>=8) c = dword >> (nbits - 8);
         else c = dword << (8 - nbits);
-        fwrite(&c, sizeof(c), 1, data->fo);
+        fwrite(&c, SYMBOL_SIZE, 1, data->fo);
         nbits -= 8;
     }
+    return 0;
 }
 
 /*
@@ -232,19 +249,45 @@ int ah_decode(ah_data *data) {
     if (strcmp(magic_number, MAGIC_NUMBER) != 0) {
         return INVALID_FILE_IN;
     }
+    data->header_flags[0] = fgetc(data->fi);
+    if (data->header_flags[0] != VERSION_BYTE) {
+        return INVALID_FILE_IN;     // Different version not supported?
+    }
+    data->header_flags[1] = fgetc(data->fi);
+    if (data->header_flags[1] != FLAGS_1_BYTE) {
+        return INVALID_FILE_IN;     // New flags not supported?
+    }
     // Original input size in bytes
-    fread(&data->length_in, sizeof(data->length_in), 1, data->fi);
+    fread(&data->length_in, NUMBER_SIZE, 1, data->fi);
     if (data->length_in == 0) return 0; // Empty file
 
     // Number of source symbols
-    fread(&data->freql->length, sizeof(data->freql->length), 1, data->fi);
+    unsigned short int length;
+    fread(&length, SMALL_COUNT_SIZE, 1, data->fi);
+    data->freql->length = length;
 
     for(unsigned int i = 0; i < data->freql->length; i++) {         // Read all elements
-        node_freqlist* p = freqlist_create_node((unsigned char)0, (unsigned char)0, 0l);
+        node_freqlist* p = freqlist_create_node(0, 0, 0l);
         if (!p) return ERROR_MEM;
-        fread(&p->symb, sizeof(p->symb), 1, data->fi);           // Read node values
-        fread(&p->bits, sizeof(p->bits), 1, data->fi);
-        fread(&p->nbits, sizeof(p->nbits), 1, data->fi);
+        fread(&p->symb, SYMBOL_SIZE, 1, data->fi);                  // Read node values
+        fread(&p->nbits, SYMBOL_SIZE, 1, data->fi);
+        int bytes_size = coo_bits_bytes_size(p->nbits);
+        if (bytes_size == 1) {
+            unsigned char bits;
+            fread(&bits, bytes_size, 1, data->fi);
+            p->bits = bits;
+        } else if (bytes_size == 2) {
+            unsigned short bits;
+            fread(&bits, bytes_size, 1, data->fi);
+            p->bits = bits;
+        } else if (bytes_size == 4) {
+            unsigned int bits;
+            fread(&bits, bytes_size, 1, data->fi);
+        } else if (bytes_size == 8) {
+            fread(&p->bits, bytes_size, 1, data->fi);
+        } else {
+            return INVALID_BITS_SIZE;
+        }
         int j = 1 << (p->nbits-1);                                  // Insert node in place
         node_freqlist* q = data->freql->tree;
         while(j > 1) {
@@ -280,38 +323,58 @@ int ah_decode(ah_data *data) {
     }
 
     // Read compressed data and extract to the output stream
-    unsigned long int bits = 0;
-    unsigned char a;
+    unsigned int bits = 0;
+    unsigned char a = 0;
     // Read the first 4 bytes in the double word bits
-    fread(&a, sizeof(a), 1, data->fi);
-    bits |= a;
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+    }
     bits <<= 8;
-    fread(&a, sizeof(a), 1, data->fi);
-    bits |= a;
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+    }
     bits <<= 8;
-    fread(&a, sizeof(a), 1, data->fi);
-    bits |= a;
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+    }
     bits <<= 8;
-    fread(&a, sizeof(a), 1, data->fi);
-    bits |= a;
+    if (!feof(data->fi)) {
+        fread(&a, SYMBOL_SIZE, 1, data->fi);
+        bits |= a;
+    }
     int j = 0;      /* Each 8 bits another byte is read */
     node_freqlist* q = data->freql->tree;
 
     do {
-        if(bits & 0x80000000) q = q->one; else q = q->zero;         // Right branch
+        if (bits & 0x80000000) q = q->one; else q = q->zero;        // Right branch
         bits <<= 1;                                                 // Next bit
         j++;
-        if(8 == j) {                                                // Each 8 bits
-            fread(&a, sizeof(a), 1, data->fi);                      // Read 1 byte from file
+        if (8 == j) {                                               // Each 8 bits
+            fread(&a, SYMBOL_SIZE, 1, data->fi);                    // Read 1 byte from file
             bits |= a;                                              // and insert in bits
             j = 0;                                                  // No holes
         }
-        if(!q->one && !q->zero) {                                   // If node is a symbol
+        if (!q->one && !q->zero) {                                  // If node is a symbol
             putc(q->symb, data->fo);                                // write down to the file
             data->length_in--;                                      // Update remaining length
             q=data->freql->tree;                                    // Back to the tree's root
         }
-    } while(data->length_in);                                       // Until file is over
+    } while (data->length_in);                                      // Until file is over
 
     return 0;
+}
+
+/*
+ * Return the number of bytes to use to
+ * record a code of nbits.
+ */
+int coo_bits_bytes_size(unsigned char nbits) {
+    if (nbits <= 8) return 1;
+    if (nbits <= 16) return 2;
+    if (nbits <= 32) return 4;
+    if (nbits <= 64) return 8;
+    return -1;  // Overflow, should never reach this
 }

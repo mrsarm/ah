@@ -1,6 +1,6 @@
 /* util.h
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -57,6 +57,13 @@ void fatal(int error_code,
  * the program after invoking the free_resources function.
  */
 void error_mem(void(free_resources)(void*), void* data);
+
+
+/*
+ * Print an invalid number of bits used by a symbol error in the stderr,
+ * and abort the program after invoking the free_resources function.
+ */
+void error_invalid_nbits(void(free_resources)(void*), void* data);
 
 
 /*

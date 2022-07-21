@@ -98,7 +98,14 @@ About
 
 Source: https://github.com/mrsarm/ah
 
-_Source code based on_:
+The intention of this project was to learn more about how to build
+compression algorithms, and specifically the Huffman algorithm, and
+how to be more proficient coding in C and in Unix systems. It was not the
+intention to build a _production ready_ CLI, although it does work, but
+other compression tools that use more algorithms not just Huffman are
+out there that are also more _battle tested_.
+
+**Source code based on**:
 
 - Huffman coding: based in the source code of the [compres](https://github.com/mrsarm/compres)
   tool written originally by Salvador Pozo Coronado (2000).

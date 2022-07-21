@@ -41,7 +41,7 @@
                 "  -h       display this help and exit\n" \
                 "\n" \
                 "With no FILE, or when FILE is -, read standard input.\n" \
-                "\"Another Huffman\" encoder project v2.0.0: ah <https://github.com/mrsarm/ah>\n"
+                "\"Another Huffman\" encoder project v3.0b1: ah <https://github.com/mrsarm/ah>\n"
 
 
 /* Initialize the global variables with the command arguments */
@@ -97,14 +97,26 @@ void compress() {
             error_unknown_code(r, "ah_count", (void*)ah_data_free_resources, data);
     }
 
-    freqlist_build_huff(data->freql);                   // Build Huffman tree
+    r = freqlist_build_huff(data->freql);               // Build Huffman tree
+    if (r == ERROR_MEM)
+        error_mem((void*)ah_data_free_resources, data);
     if (data->verbose) {
         freqlist_fprintf(stderr, VERBOSE_TABLE, data->freql);
         fprintf(stderr, "\n");
         freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
     }
 
-    ah_encode(data);                                    // Encode and write
+    r = ah_encode(data);                            // Encode and write
+    switch (r) {
+        case OK: break;
+        case ERROR_MEM:
+            error_mem((void*)ah_data_free_resources, data);
+        case INVALID_BITS_SIZE:
+            error_invalid_nbits((void*)ah_data_free_resources, data);
+        default:
+            error_unknown_code(r, "ah_encode", (void*)ah_data_free_resources, data);
+    }
+
 }
 
 /* Decompress input */
@@ -114,6 +126,8 @@ void decompress() {
         case OK: break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
+        case INVALID_BITS_SIZE:
+            error_invalid_nbits((void*)ah_data_free_resources, data);
         case INVALID_FILE_IN:
             error_invalid_file_in(r, "input", data->filename_in, (void*)ah_data_free_resources, data);
         default:
@@ -172,16 +186,27 @@ ah_data* init_options(int argc, char *argv[]) {
 
 /* Ctrl+C handler */
 void ctrlc_handler(int sig) {
-    printf("\n");
-    if (data && data->freql && data->verbose) {
+    // If canceled and verbose mode is enabled,
+    // the tables and Huffman tree is printed out at least.
+    // If the process didn't start to record in the output
+    // file, no content will be recorded.
+    if (data && data->freql) {
         if (!data->decompres) {
             freqlist_sort(data->freql);
-            freqlist_build_huff(data->freql);
-            freqlist_fprintf(stdout, VERBOSE_TABLE, data->freql);
-            fprintf(stderr, "\n");
+            int r = freqlist_build_huff(data->freql);
+            if (r == ERROR_MEM)
+                error_mem((void*)ah_data_free_resources, data);
+            if (data->verbose) {
+                freqlist_fprintf(stderr, VERBOSE_TABLE, data->freql);
+                fprintf(stderr, "\n");
+            }
         }
-        freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
+        if (data->verbose) {
+            freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
+        }
+        ah_data_free_resources(data);
     }
+    fprintf(stderr, "\n");
     exit(0);
 }
 
