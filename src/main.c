@@ -41,7 +41,7 @@
                 "  -h       display this help and exit\n" \
                 "\n" \
                 "With no FILE, or when FILE is -, read standard input.\n" \
-                "\"Another Huffman\" encoder project v2.0.0: ah <https://github.com/mrsarm/ah>\n"
+                "\"Another Huffman\" encoder project v3.0b1: ah <https://github.com/mrsarm/ah>\n"
 
 
 /* Initialize the global variables with the command arguments */
