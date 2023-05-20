@@ -28,11 +28,11 @@ info and store the encoded result in the `banana.ah` file:
 The output can be redirected to the standard output with `-c`, while in
 verbose mode (`-v`) the debug information goes to the standard error stream.
 Also using `-` as file argument, the data is taken from the standard
-input stream.
+input stream like the example above.
 
 To decode a file or the input stream, use `-d`:
 
-    $ ah README.md          # Encode and store in README.md.av
+    $ ah README.md          # Encode and store in README.md.ah
     $ ah -d README.md.av    # Decode and store in README.md
 
 Check all the options available with `ah -h`.
@@ -113,6 +113,6 @@ out there that are also more _battle tested_.
 - Printing of the Huffman tree: algorithm based in the code from Randy Gaul's Game
   Programming Blog (2015) [Printing Pretty Ascii Trees](https://www.randygaul.net/2015/06/15/printing-pretty-ascii-trees/).
 
-Authors: (2021-2022) Mariano Ruiz <mrsarm@gmail.cm>
+Authors: (2021-2023) Mariano Ruiz <mrsarm@gmail.cm>
 
 License: LGPL-3
