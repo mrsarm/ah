@@ -92,5 +92,6 @@ add_custom_target(clean-all
                        ${CMAKE_BINARY_DIR}/BuildTestTarget.cmake
                        ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
                        ${CMAKE_BINARY_DIR}/Testing
+                       ${CMAKE_BINARY_DIR}/cmake-build-release
              && rmdir  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )

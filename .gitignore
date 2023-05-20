@@ -32,6 +32,7 @@ BuildTestTarget.cmake
 CTestTestfile.cmake
 out/
 Testing/
+cmake-build-release/
 
 # Linux desktop files
 .directory
