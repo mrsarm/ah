@@ -293,6 +293,7 @@ int _ah_read_header(ah_data *data) {
         } else if (bytes_size == 4) {
             unsigned int bits;
             fread(&bits, bytes_size, 1, data->fi);
+            p->bits = bits;
         } else if (bytes_size == 8) {
             fread(&p->bits, bytes_size, 1, data->fi);
         } else {
