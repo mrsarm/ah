@@ -1,6 +1,6 @@
 /* test_util.c
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ ah_data* count_buff(unsigned char* buff_in, unsigned int buff_in_length, int ver
     switch (r) {
         case OK: break;
         case ERROR_MEM:
-            error_mem((void*)free_resources, data);
+            error_mem((void*)ah_data_free_resources, data);
         default:
             error_unknown_code(r, "fq_count", (void*)ah_data_free_resources, data);
     }
@@ -50,16 +50,6 @@ ah_data* count_buff(unsigned char* buff_in, unsigned int buff_in_length, int ver
     freqlist_fprintf(stdout, "> Final frequency table\n", data->freql);
     if (data->verbose) printf("\n=====================================\n\n");
     return data;
-}
-
-
-/*
- * Free only the resources used in test mode.
- */
-void free_resources(ah_data *data)
-{
-    if (data->freql) freqlist_free(data->freql);
-    free(data);
 }
 
 

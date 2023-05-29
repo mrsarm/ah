@@ -1,6 +1,6 @@
 /* test_ah.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ CHEAT_DECLARE(
 
 CHEAT_TEAR_DOWN(
     if (data) {
-        free_resources(data);
+        ah_data_free_resources(data);
     }
 )
 
