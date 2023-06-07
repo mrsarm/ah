@@ -1,6 +1,6 @@
 /* const.h
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@
 #define ERROR_FILE_NOT_FOUND            5       /* The input file is not found or can not
                                                    be opened. */
 #define ERROR_FILE_OUT                  6       /* Cannot open output file */
-#define INVALID_FILE_IN                 7       /* Cannot open output file */
+#define INVALID_FILE_IN                 7       /* Cannot open input file */
 #define INVALID_BITS_SIZE               8       /* Invalid number of bits to encode a symbol */
 #define ERROR_UNKNOWN                   50      /* Unknown error */
 

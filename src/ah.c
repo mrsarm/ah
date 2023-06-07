@@ -1,6 +1,6 @@
 /* ah.c
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -165,9 +165,10 @@ int ah_count(ah_data *data) {
 }
 
 /*
- * Encode and write the compressed data.
+ * Write header information in output file, including
+ * the Huffman table.
  */
-int ah_encode(ah_data *data) {
+int _ah_write_header(ah_data *data) {
     // Write "magic" number that identifies the format
     fwrite(MAGIC_NUMBER, MAGIC_NUMBER_SIZE, 1, data->fo);
     // Write basic header info
@@ -201,6 +202,17 @@ int ah_encode(ah_data *data) {
         }
         pnode = pnode->next;
     }
+    return OK;
+}
+
+
+/*
+ * Encode and write the compressed data.
+ */
+int ah_encode(ah_data *data) {
+    int r = _ah_write_header(data);
+    if (r) return r;
+
     if (data->buffer_in) {
         data->fi = fmemopen(data->buffer_in, data->length_in, "rb");
     } else {
@@ -209,6 +221,7 @@ int ah_encode(ah_data *data) {
     unsigned long int dword = 0l;   // Word used during encoding
     int nbits = 0;                  // Number of bits used in dword
     unsigned char c;                // Read here input file byte by byte
+    node_freqlist *pnode;           // Current node to be written
     do {
         c = fgetc(data->fi);
         if(feof(data->fi)) break;
@@ -229,13 +242,10 @@ int ah_encode(ah_data *data) {
         fwrite(&c, SYMBOL_SIZE, 1, data->fo);
         nbits -= 8;
     }
-    return 0;
+    return OK;
 }
 
-/*
- * Decode and write the raw data.
- */
-int ah_decode(ah_data *data) {
+int _ah_read_header(ah_data *data) {
     data->freql = freqlist_create();
     if (!data->freql) {
         return ERROR_MEM;
@@ -283,6 +293,7 @@ int ah_decode(ah_data *data) {
         } else if (bytes_size == 4) {
             unsigned int bits;
             fread(&bits, bytes_size, 1, data->fi);
+            p->bits = bits;
         } else if (bytes_size == 8) {
             fread(&p->bits, bytes_size, 1, data->fi);
         } else {
@@ -321,6 +332,15 @@ int ah_decode(ah_data *data) {
             q->zero = p;
         }
     }
+    return OK;
+}
+
+/*
+ * Decode and write the raw data.
+ */
+int ah_decode(ah_data *data) {
+    int r = _ah_read_header(data);
+    if (r) return r;
 
     // Read compressed data and extract to the output stream
     unsigned int bits = 0;

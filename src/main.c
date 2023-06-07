@@ -1,6 +1,6 @@
 /* main.c
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@
                 "  -h       display this help and exit\n" \
                 "\n" \
                 "With no FILE, or when FILE is -, read standard input.\n" \
-                "\"Another Huffman\" encoder project v3.0b1: ah <https://github.com/mrsarm/ah>\n"
+                "\"Another Huffman\" encoder project v3.0b2: ah <https://github.com/mrsarm/ah>\n"
 
 
 /* Initialize the global variables with the command arguments */
