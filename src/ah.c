@@ -185,7 +185,7 @@ int _ah_write_header(ah_data *data) {
         fwrite(&pnode->symb, SYMBOL_SIZE, 1, data->fo);
         fwrite(&pnode->nbits, SYMBOL_SIZE, 1, data->fo);
         // Write each symbol "bits" with as fewer bits as possible
-        int bytes_size = coo_bits_bytes_size(pnode->nbits);
+        int bytes_size = ah_bits_bytes_size(pnode->nbits);
         if (bytes_size == 1) {
             unsigned char bits = (unsigned char) pnode->bits;
             fwrite(&bits, bytes_size, 1, data->fo);
@@ -281,7 +281,7 @@ int _ah_read_header(ah_data *data) {
         if (!p) return ERROR_MEM;
         fread(&p->symb, SYMBOL_SIZE, 1, data->fi);                  // Read node values
         fread(&p->nbits, SYMBOL_SIZE, 1, data->fi);
-        int bytes_size = coo_bits_bytes_size(p->nbits);
+        int bytes_size = ah_bits_bytes_size(p->nbits);
         if (bytes_size == 1) {
             unsigned char bits;
             fread(&bits, bytes_size, 1, data->fi);
@@ -391,7 +391,7 @@ int ah_decode(ah_data *data) {
  * Return the number of bytes to use to
  * record a code of nbits.
  */
-int coo_bits_bytes_size(unsigned char nbits) {
+int ah_bits_bytes_size(unsigned char nbits) {
     if (nbits <= 8) return 1;
     if (nbits <= 16) return 2;
     if (nbits <= 32) return 4;
