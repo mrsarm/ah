@@ -1,6 +1,6 @@
 /* ah.h
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -35,6 +35,8 @@ typedef struct _ah_data {
     FILE *fi,                   /* Input file manager */
          *fo;                   /* Output file manager. */
     unsigned long length_in;    /* File size in bytes */
+    unsigned long length_out;   /* File size in bytes for output, without
+                                   taking into account headers (verbose) */
     unsigned char *buffer_in;   /* Buffer to keep all the content from
                                    fi (only used when fi = stdin) */
     unsigned long length_buff;  /* Buffer size in bytes */
@@ -97,6 +99,15 @@ int ah_decode(ah_data *data);
  * record a code of nbits.
  */
 int ah_bits_bytes_size(unsigned char nbits);
+
+
+/*
+ * Print a summary.
+ *
+ * @f: the output stream, e.g. the stdout
+ * @data: the ah_data struct with the data
+ */
+void ah_fprintf_summary(FILE *f, const ah_data *data);
 
 
 #endif /* __AH_H */

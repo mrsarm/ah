@@ -3,7 +3,8 @@
 
 Command line tool "ah": **Another Huffman** encoder to compress and decompress
 files, with the cool addition of the verbose mode, that display useful
-information like the encoding table and the Huffman binary tree.
+information like the encoding table, the Huffman binary tree and
+a compression summary.
 
 Let's encode the word _"banana"_ from the input stream, show encoding
 info and store the encoded result in the `banana.ah` file:
@@ -24,6 +25,13 @@ info and store the encoded result in the `banana.ah` file:
      `--1 (3)
          `--0 (2) 'n' [6E]
          `--1 (1) 'b' [62]
+
+    [ Summary ] ================================================
+    Uncompressed size: 6
+    Compressed size (without headers): 2
+    Ratio (without headers): 0.333333
+    ============================================================
+
 
 The output can be redirected to the standard output with `-c`, while in
 verbose mode (`-v`) the debug information goes to the standard error stream.
