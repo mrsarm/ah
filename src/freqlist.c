@@ -43,8 +43,17 @@ void freqlist_fprintf(FILE *f, const char *title, const freqlist *freql) {
     fprintf(f, "Symbol    Frequency   Pos   Bits    Binary code\n");
     fprintf(f, "-----------------------------------------------\n");
     for (node_freqlist *pnode_i=freql->list; pnode_i; pnode_i=pnode_i->next) {
-        fprintf(f, "'%c' %02X    %9lu    %2X   %4i    ",
-                (pnode_i->symb < 0x7F && pnode_i->symb >= 0x20) ? pnode_i->symb : '.',
+        char symb[4];
+        char *psymb;
+        if (pnode_i->symb < 0x7F && pnode_i->symb >= 0x20) {
+            sprintf(symb, "'%c'", pnode_i->symb);
+            psymb = symb;
+        } else {
+            // non-printable symbol
+            psymb = " . ";
+        }
+        fprintf(f, "%s %02X    %9lu    %2X   %4i    ",
+                psymb,
                 pnode_i->symb,
                 pnode_i->freq,
                 pnode_i->pos,

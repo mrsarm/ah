@@ -26,11 +26,11 @@ info and store the encoded result in the `banana.ah` file:
          `--0 (2) 'n' [6E]
          `--1 (1) 'b' [62]
 
-    [ Summary ] ================================================
+    [ Summary ] ===================================
     Uncompressed size: 6
     Compressed size (without headers): 2
     Ratio (without headers): 0.333333
-    ============================================================
+    ===============================================
 
 
 The output can be redirected to the standard output with `-c`, while in

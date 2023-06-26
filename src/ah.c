@@ -409,7 +409,7 @@ int ah_bits_bytes_size(unsigned char nbits) {
  * @data: the coo_data struct with the data
  */
 void ah_fprintf_summary(FILE *f, const ah_data *data) {
-    fprintf(f, "[ Summary ] ================================================\n");
+    fprintf(f, "[ Summary ] ===================================\n");
     fprintf(f, "Uncompressed size: %lu\n", data->length_in);
     fprintf(f, "Compressed size (without headers): %lu\n", data->length_out);
     if (data->length_in > 0) {
@@ -418,5 +418,5 @@ void ah_fprintf_summary(FILE *f, const ah_data *data) {
     } else {
         fprintf(f, "Ratio (without headers): -\n");
     }
-    fprintf(f, "============================================================\n");
+    fprintf(f, "===============================================\n");
 }
