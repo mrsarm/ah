@@ -1,6 +1,6 @@
 /* freqlist.c
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -474,10 +474,10 @@ int freqlist_build_huff(freqlist *l) {
     if (!l->list) return 0;
     l->tree = l->list;
     node_freqlist *p = l->list;
-    do {
+    while (p) {
         p->tnext = p->next;
         p = p->next;
-    } while (p);
+    }
     while (l->tree && l->tree->tnext) {              // While exist at least 2 elements in the list
         p = (node_freqlist *)malloc(sizeof(node_freqlist));     // A new tree node (that is a sub-tree)
         if (!p) return ERROR_MEM;
