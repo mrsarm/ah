@@ -85,9 +85,16 @@ void _freqlist_fprintf_tree(FILE *f, node_freqlist *tree, char *depth, int *di, 
     if (tree->freq)
         fprintf(f, " (%li)", tree->freq);
     if (!tree->zero && !tree->one && *di) {     // No subtrees and not root --> leaf
-        fprintf(f, " '%c' [%02X]",
-                (tree->symb < 0x7F && tree->symb >= 0x20) ? tree->symb : '.',
-                tree->symb);
+        char symb[4];
+        char *psymb;
+        if (tree->symb < 0x7F && tree->symb >= 0x20) {
+            sprintf(symb, "'%c'", tree->symb);
+            psymb = symb;
+        } else {
+            // non-printable symbol
+            psymb = " . ";
+        }
+        fprintf(f, " %s [%02X]", psymb, tree->symb);
     }
     fprintf(f, "\n");
     if (tree->zero) {
