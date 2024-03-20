@@ -100,10 +100,11 @@ add_custom_target(clean-all
                        ${CMAKE_BINARY_DIR}/Makefile
                        ${CMAKE_BINARY_DIR}/CMakeFiles
                        ${CMAKE_BINARY_DIR}/cmake-build-debug
+                       ${CMAKE_BINARY_DIR}/cmake-build-release
                        ${CMAKE_BINARY_DIR}/install_manifest.txt
                        ${CMAKE_BINARY_DIR}/BuildTestTarget.cmake
                        ${CMAKE_BINARY_DIR}/CTestTestfile.cmake
                        ${CMAKE_BINARY_DIR}/Testing
-                       ${CMAKE_BINARY_DIR}/cmake-build-release
+                       ${CMAKE_BINARY_DIR}/_deps
              && rmdir  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
