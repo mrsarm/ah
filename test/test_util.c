@@ -1,6 +1,6 @@
 /* test_util.c
 
-   Copyright (C) 2021 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2024 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -19,8 +19,8 @@
 
 
 #include <string.h>
+#include <cheat.h>
 #include <util.h>
-#include "cheat.h"
 
 
 /***************

@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 project(ah C)
 
+include(FetchContent)
 enable_testing()
 
 set(CMAKE_C_STANDARD 99)
@@ -22,20 +23,31 @@ add_executable(ah src/main.c
 set(BASE_TEST_SOURCE_FILES
     test/util_t.c)
 
-# Executable with unit tests "test_fq"
+FetchContent_Declare(
+        cheat_h
+        URL      https://github.com/Tuplanolla/cheat/archive/refs/tags/1.0.4.tar.gz
+        URL_HASH MD5=30c3edd18d1f6d96e2da0c6682f260b7
+        DOWNLOAD_EXTRACT_TIMESTAMP true
+)
+FetchContent_MakeAvailable(cheat_h)
+
+# Executable with unit tests "test_ah"
 add_executable(test_ah test/test_ah.c
                ${BASE_TEST_SOURCE_FILES}
                ${BASE_SOURCE_FILES})
+target_include_directories(test_ah PUBLIC "${cheat_h_SOURCE_DIR}")
 
 # Executable with unit tests "test_huff"
 add_executable(test_huff test/test_huff.c
         ${BASE_TEST_SOURCE_FILES}
         ${BASE_SOURCE_FILES})
+target_include_directories(test_huff PUBLIC "${cheat_h_SOURCE_DIR}")
 
 # Executable with unit tests "test_util"
 add_executable(test_util test/test_util.c
         ${BASE_TEST_SOURCE_FILES}
         ${BASE_SOURCE_FILES})
+target_include_directories(test_util PUBLIC "${cheat_h_SOURCE_DIR}")
 
 # Install with `make install`
 install(TARGETS ah

@@ -1,6 +1,6 @@
 /* freqlist.c
 
-   Copyright (C) 2021-2022 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -43,8 +43,17 @@ void freqlist_fprintf(FILE *f, const char *title, const freqlist *freql) {
     fprintf(f, "Symbol    Frequency   Pos   Bits    Binary code\n");
     fprintf(f, "-----------------------------------------------\n");
     for (node_freqlist *pnode_i=freql->list; pnode_i; pnode_i=pnode_i->next) {
-        fprintf(f, "'%c' %02X    %9lu    %2X   %4i    ",
-                (pnode_i->symb < 0x7F && pnode_i->symb >= 0x20) ? pnode_i->symb : '.',
+        char symb[4];
+        char *psymb;
+        if (pnode_i->symb < 0x7F && pnode_i->symb >= 0x20) {
+            sprintf(symb, "'%c'", pnode_i->symb);
+            psymb = symb;
+        } else {
+            // non-printable symbol
+            psymb = " . ";
+        }
+        fprintf(f, "%s %02X    %9lu    %2X   %4i    ",
+                psymb,
                 pnode_i->symb,
                 pnode_i->freq,
                 pnode_i->pos,
@@ -76,9 +85,16 @@ void _freqlist_fprintf_tree(FILE *f, node_freqlist *tree, char *depth, int *di, 
     if (tree->freq)
         fprintf(f, " (%li)", tree->freq);
     if (!tree->zero && !tree->one && *di) {     // No subtrees and not root --> leaf
-        fprintf(f, " '%c' [%02X]",
-                (tree->symb < 0x7F && tree->symb >= 0x20) ? tree->symb : '.',
-                tree->symb);
+        char symb[4];
+        char *psymb;
+        if (tree->symb < 0x7F && tree->symb >= 0x20) {
+            sprintf(symb, "'%c'", tree->symb);
+            psymb = symb;
+        } else {
+            // non-printable symbol
+            psymb = " . ";
+        }
+        fprintf(f, " %s [%02X]", psymb, tree->symb);
     }
     fprintf(f, "\n");
     if (tree->zero) {
@@ -465,10 +481,10 @@ int freqlist_build_huff(freqlist *l) {
     if (!l->list) return 0;
     l->tree = l->list;
     node_freqlist *p = l->list;
-    do {
+    while (p) {
         p->tnext = p->next;
         p = p->next;
-    } while (p);
+    }
     while (l->tree && l->tree->tnext) {              // While exist at least 2 elements in the list
         p = (node_freqlist *)malloc(sizeof(node_freqlist));     // A new tree node (that is a sub-tree)
         if (!p) return ERROR_MEM;

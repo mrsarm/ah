@@ -1,6 +1,6 @@
 /* main.c
 
-   Copyright (C) 2021-2023 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2024 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@
                 "  -h       display this help and exit\n" \
                 "\n" \
                 "With no FILE, or when FILE is -, read standard input.\n" \
-                "\"Another Huffman\" encoder project v3.0.0: ah <https://github.com/mrsarm/ah>\n"
+                "\"Another Huffman\" encoder project v3.1b1: ah <https://github.com/mrsarm/ah>\n"
 
 
 /* Initialize the global variables with the command arguments */
@@ -108,7 +108,12 @@ void compress() {
 
     r = ah_encode(data);                            // Encode and write
     switch (r) {
-        case OK: break;
+        case OK:
+            if (data->verbose) {
+                fprintf(stderr, "\n");
+                ah_fprintf_summary(stderr, data);
+            }
+            break;
         case ERROR_MEM:
             error_mem((void*)ah_data_free_resources, data);
         case INVALID_BITS_SIZE:
@@ -198,10 +203,10 @@ void ctrlc_handler(int sig) {
                 error_mem((void*)ah_data_free_resources, data);
             if (data->verbose) {
                 freqlist_fprintf(stderr, VERBOSE_TABLE, data->freql);
-                fprintf(stderr, "\n");
             }
         }
         if (data->verbose) {
+            fprintf(stderr, "\n");
             freqlist_fprintf_tree(stderr, VERBOSE_TREE, data->freql);
         }
         ah_data_free_resources(data);

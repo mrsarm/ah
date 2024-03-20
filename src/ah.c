@@ -47,6 +47,7 @@ ah_data *ah_data_init(void) {
         data->length_buff = 0;
         data->freql = NULL;
         data->length_in = 0l;
+        data->length_out = 0l;
         data->header_flags[0] = 0;
         data->header_flags[1] = 0;
     }
@@ -185,7 +186,7 @@ int _ah_write_header(ah_data *data) {
         fwrite(&pnode->symb, SYMBOL_SIZE, 1, data->fo);
         fwrite(&pnode->nbits, SYMBOL_SIZE, 1, data->fo);
         // Write each symbol "bits" with as fewer bits as possible
-        int bytes_size = coo_bits_bytes_size(pnode->nbits);
+        int bytes_size = ah_bits_bytes_size(pnode->nbits);
         if (bytes_size == 1) {
             unsigned char bits = (unsigned char) pnode->bits;
             fwrite(&bits, bytes_size, 1, data->fo);
@@ -231,6 +232,7 @@ int ah_encode(ah_data *data) {
             c = dword >> (nbits - 8);                   // Extract the 8 bits with higher
             fwrite(&c, SYMBOL_SIZE, 1, data->fo);       // order and write down into the file.
             nbits -= 8;                                 // Now we have those 8 bits available
+            data->length_out += SYMBOL_SIZE;
         }
         dword <<= pnode->nbits;                         // Make room for the new byte
         dword |= pnode->bits;                           // Insert the new byte
@@ -241,6 +243,7 @@ int ah_encode(ah_data *data) {
         else c = dword << (8 - nbits);
         fwrite(&c, SYMBOL_SIZE, 1, data->fo);
         nbits -= 8;
+        data->length_out += SYMBOL_SIZE;
     }
     return OK;
 }
@@ -281,7 +284,7 @@ int _ah_read_header(ah_data *data) {
         if (!p) return ERROR_MEM;
         fread(&p->symb, SYMBOL_SIZE, 1, data->fi);                  // Read node values
         fread(&p->nbits, SYMBOL_SIZE, 1, data->fi);
-        int bytes_size = coo_bits_bytes_size(p->nbits);
+        int bytes_size = ah_bits_bytes_size(p->nbits);
         if (bytes_size == 1) {
             unsigned char bits;
             fread(&bits, bytes_size, 1, data->fi);
@@ -391,10 +394,29 @@ int ah_decode(ah_data *data) {
  * Return the number of bytes to use to
  * record a code of nbits.
  */
-int coo_bits_bytes_size(unsigned char nbits) {
+int ah_bits_bytes_size(unsigned char nbits) {
     if (nbits <= 8) return 1;
     if (nbits <= 16) return 2;
     if (nbits <= 32) return 4;
     if (nbits <= 64) return 8;
     return -1;  // Overflow, should never reach this
+}
+
+/*
+ * Print a summary.
+ *
+ * @f: the output stream, e.g. the stdout
+ * @data: the coo_data struct with the data
+ */
+void ah_fprintf_summary(FILE *f, const ah_data *data) {
+    fprintf(f, "[ Summary ] ===================================\n");
+    fprintf(f, "Uncompressed size: %lu\n", data->length_in);
+    fprintf(f, "Compressed size (without headers): %lu\n", data->length_out);
+    if (data->length_in > 0) {
+        fprintf(f, "Ratio (without headers): %f\n",
+                ((double) data->length_out) / (double) data->length_in);
+    } else {
+        fprintf(f, "Ratio (without headers): -\n");
+    }
+    fprintf(f, "===============================================\n");
 }
