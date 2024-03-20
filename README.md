@@ -121,6 +121,6 @@ out there that are also more _battle tested_.
 - Printing of the Huffman tree: algorithm based in the code from Randy Gaul's Game
   Programming Blog (2015) [Printing Pretty Ascii Trees](https://www.randygaul.net/2015/06/15/printing-pretty-ascii-trees/).
 
-Authors: (2021-2023) Mariano Ruiz <mrsarm@gmail.cm>
+Authors: (2021-2024) Mariano Ruiz <mrsarm@gmail.cm>
 
 License: LGPL-3
