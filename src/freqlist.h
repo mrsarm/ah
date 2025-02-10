@@ -58,12 +58,14 @@ typedef struct _node_freqlist
     /* Tree data, used to build the binary tree with the Huffman codes */
 
     struct _node_freqlist *tnext;   /* Next node in the tree list */
-    struct _node_freqlist *zero;    /* Pointer to the previous node in
-                                       the list, with frequency greater
-                                       or equal than this. */
-    struct _node_freqlist *one;     /* Pointer to the next node in the list,
-                                       with frequency less or equal
-                                       than this. */
+    struct _node_freqlist *zero;    /* Pointer to the "0" branch of the
+                                       tree, with frequencies greater
+                                       or equal than one, or NULL
+                                       if it's a leave. */
+    struct _node_freqlist *one;     /* Pointer to the "1" branch of the
+                                       tree, with frequencies less or
+                                       equal than zero, or NULL
+                                       if it's a leave. */
     unsigned long int bits;         /* Huffman binary code */
     unsigned char nbits;            /* Number of bits used by bits */
 } node_freqlist;
