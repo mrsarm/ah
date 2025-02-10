@@ -1,6 +1,6 @@
 /* main.c
 
-   Copyright (C) 2021-2024 Mariano Ruiz <mrsarm@gmail.com>
+   Copyright (C) 2021-2025 Mariano Ruiz <mrsarm@gmail.com>
    This file is part of the "Another Huffman" encoder project.
 
    This project is free software; you can redistribute it and/or
@@ -14,7 +14,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the "Frequency Counter" project; if not, see
+   License along with the "Another Huffman" encoder project; if not, see
    <http://www.gnu.org/licenses/>.  */
 
 

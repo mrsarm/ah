@@ -14,7 +14,7 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the "Frequency Counter" project; if not, see
+   License along with the "Another Huffman" encoder project; if not, see
    <http://www.gnu.org/licenses/>.  */
 
 
