@@ -119,8 +119,8 @@ out there that are also more _battle tested_.
   tool written originally by Salvador Pozo Coronado (2000).
 - Frequency table generation: [fq](https://github.com/mrsarm/fq) CLI.
 - Printing of the Huffman tree: algorithm based in the code from Randy Gaul's Game
-  Programming Blog (2015) [Printing Pretty Ascii Trees](https://www.randygaul.net/2015/06/15/printing-pretty-ascii-trees/).
+  Programming Blog (2015) [Printing Pretty Ascii Trees](https://web.archive.org/web/20161206075428/https://www.randygaul.net/2015/06/15/printing-pretty-ascii-trees/).
 
-Authors: (2021-2024) Mariano Ruiz <mrsarm@gmail.cm>
+Authors: (2021-2025) Mariano Ruiz <mrsarm@gmail.cm>
 
 License: LGPL-3
